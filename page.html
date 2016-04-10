@@ -16,6 +16,9 @@ body {
   stroke: #000;
   shape-rendering: crispEdges;
 }
+    
+    .line { background-color: aqua;
+    font-size: 20px;}
 
 .line {
   fill: none;
@@ -43,6 +46,7 @@ body {
 
 </style>
 <body>
+    <p class="line">Test</p>
 <script src="./d3/d3.js"></script>
 <script>
     
@@ -110,6 +114,7 @@ d3.csv("data2.csv", function(error, data) {
   // https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Array/map
   var cities = color.domain().map(function(name) {
     return {
+      active: false,
       name: name.split(',')[0],
       values: data.map(function(d) {
         return {date: d.date, temperature: +d[name]};
@@ -137,7 +142,7 @@ d3.csv("data2.csv", function(error, data) {
   svg.append("g")
       .attr("class", "y axis")
       .call(yAxis)
-    .append("text")
+      .append("text")
       .attr("x", 30)
       .attr("y", 0)
       .attr("dy", ".71em")
@@ -156,8 +161,9 @@ labels.selectAll(".label")
     // first d.active is undefined than it is set to true
     console.log(d);
     var active   = d.active ? false : true;
+    console.log(d);
     newOpacity = active ? 0 : 1;
-    d3.selectAll("."+d.name)
+    d3.selectAll("."+d.name.replace(/\s+/g, '').replace(/\./g, ''))
         .transition()
         .style("opacity", newOpacity);
     if(!active) {
@@ -177,7 +183,7 @@ labels.selectAll(".label")
       .attr("class", "city");
 
   city.append("path")
-      .attr("class", function(d) { return "line " + d.name; })
+      .attr("class", function(d) { return "line " + d.name.replace(/\s+/g, '').replace(/\./g, ''); })
       .attr("d", function(d) { return line(d.values); })
       .style("stroke", function(d) { return color(d.name); });
 
@@ -186,7 +192,7 @@ labels.selectAll(".label")
       .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.temperature) + ")"; })
       .attr("x", 3)
       .attr("dy", ".35em")
-      .attr("class", function(d) { return d.name; })
+      .attr("class", function(d) { return d.name.replace(/\s+/g, '').replace(/\./g, '').replace(/\./g, ''); })
       .text(function(d) { return d.name; });
 });
 
