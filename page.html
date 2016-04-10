@@ -82,7 +82,7 @@ d3.csv("data2.csv", function(error, data) {
   // https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Array/map
   var cities = color.domain().map(function(name) {
     return {
-      name: name,
+      name: name.split(',')[0],
       values: data.map(function(d) {
         return {date: d.date, temperature: +d[name]};
       })
