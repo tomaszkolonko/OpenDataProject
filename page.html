@@ -24,7 +24,7 @@ body {
 }
 
 .label {
-    background-color: white;
+    background-color: #dddddd;
     border: 1px solid black;
     border-radius: 10px;
     color: black;
@@ -37,7 +37,7 @@ body {
 }
     
 .label:hover {
-    background-color: #dddddd;
+    background-color: white;
     color: black;
 }
 
@@ -149,16 +149,35 @@ d3.csv("data2.csv", function(error, data) {
     .enter()
     .append("span")
     .attr("class", "label")
-    .attr("id", function(d) { return d.name; })
     .text(function(d) { return d.name; });
+    
+labels.selectAll(".label")
+    .on("click", function(d) { 
+    // first d.active is undefined than it is set to true
+    console.log(d);
+    var active   = d.active ? false : true;
+    newOpacity = active ? 0 : 1;
+    d3.selectAll("."+d.name)
+        .transition()
+        .style("opacity", newOpacity);
+    if(!active) {
+        this.style.background='#55ff55';    
+    } else {
+        this.style.background='#dddddd'
+    }
+
+    d.active = active;
+});
+    
 
   var city = svg.selectAll(".city")
       .data(cities)
-    .enter().append("g")
+      .enter()
+      .append("g")
       .attr("class", "city");
 
   city.append("path")
-      .attr("class", "line")
+      .attr("class", function(d) { return "line " + d.name; })
       .attr("d", function(d) { return line(d.values); })
       .style("stroke", function(d) { return color(d.name); });
 
@@ -167,9 +186,8 @@ d3.csv("data2.csv", function(error, data) {
       .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.temperature) + ")"; })
       .attr("x", 3)
       .attr("dy", ".35em")
+      .attr("class", function(d) { return d.name; })
       .text(function(d) { return d.name; });
-
-  d3.selectAll(".labels").on("click", function() { alert("test"); })
 });
 
 </script>
