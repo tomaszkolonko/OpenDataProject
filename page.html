@@ -133,8 +133,8 @@ d3.csv("data2.csv", function(error, data) {
   cities_display = cities;
   //x.domain(d3.extent(data, function(d) { return d.date; }));
   x.domain([
-      d3.min(yearArray, function(d) {return d; }),
-      d3.max(yearArray, function(d) {return d; })
+      d3.min(yearArray, function(d) { return d; }),
+      d3.max(yearArray, function(d) { return d; })
   ]);
   xAxis.tickValues(yearArray);
         
@@ -142,6 +142,8 @@ d3.csv("data2.csv", function(error, data) {
     d3.min(cities, function(c) { if(c.active) {return d3.min(c.values, function(v) { return v.spending; });} }),
     d3.max(cities, function(c) { if(c.active) {return d3.max(c.values, function(v) { return v.spending; });} })
   ]);
+
+
 
   svg.append("g")
       .attr("class", "x axis")
@@ -174,8 +176,6 @@ d3.csv("data2.csv", function(error, data) {
     
   labels.selectAll(".label")
     .on("click", function(d) { 
-    // first d.active is undefined than it is set to true
-    console.log(d);
     var active   = d.active ? false : true;
     console.log(d);
     newOpacity = active ? 1 : 0;
@@ -187,7 +187,18 @@ d3.csv("data2.csv", function(error, data) {
     } else {
         this.classList.remove("active");   
     }
-    d.active = active;
+	d.active = active;
+
+	y.domain([
+		d3.min(cities, function(c) { if(c.active) {return d3.min(c.values, function(v) { console.log(v.spending);return v.spending; });} }),
+		d3.max(cities, function(c) { if(c.active) {return d3.max(c.values, function(v) { console.log(v.spending);return v.spending; });} })
+	]);
+
+	svg.select(".y.axis").transition().duration(1000).call(yAxis);   
+ 
+	// TODO: update the transitions with seperate methods.
+	// https://bl.ocks.org/mbostock/3808218
+
 	});
     
   var city = svg.selectAll(".city")
