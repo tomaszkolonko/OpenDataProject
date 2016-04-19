@@ -12,18 +12,19 @@ body {
 
 .axis path,
 .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
 }
-    
-    .line { background-color: aqua;
-    font-size: 20px;}
+   
+.line { background-color: aqua;
+	font-size: 20px;
+}
 
 .line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
+	fill: none;
+	stroke: steelblue;
+	stroke-width: 1.5px;
 }
 
 .label {
@@ -54,9 +55,10 @@ body {
     
 var global_data, global_cities;
 
-var margin = {top: 20, right: 80, bottom: 30, left: 50},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+var margin = {top: 20, right: 80, bottom: 30, left: 50};
+
+var width = 960 - margin.left - margin.right;
+var height = 500 - margin.top - margin.bottom;
 
 var x = d3.scale.linear()
     .range([0, width]);
@@ -79,7 +81,7 @@ var yAxis = d3.svg.axis()
 var line = d3.svg.line()
     .interpolate("basis")
     .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.temperature); });
+    .y(function(d) { return y(d.spending); });
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -117,10 +119,12 @@ d3.csv("data2.csv", function(error, data) {
       active: false,
       name: name.split(',')[0],
       values: data.map(function(d) {
-        return {date: d.date, temperature: +d[name]};
+        return {date: d.date, spending: +d[name]};
       })
     };
   });
+
+  // TODO: delete after developement
   global_cities = cities;
   //x.domain(d3.extent(data, function(d) { return d.date; }));
   x.domain([
@@ -130,8 +134,8 @@ d3.csv("data2.csv", function(error, data) {
   xAxis.tickValues(yearArray);
         
   y.domain([
-    d3.min(cities, function(c) { return d3.min(c.values, function(v) { return v.temperature; }); }),
-    d3.max(cities, function(c) { return d3.max(c.values, function(v) { return v.temperature; }); })
+    d3.min(cities, function(c) { return d3.min(c.values, function(v) { return v.spending; }); }),
+    d3.max(cities, function(c) { return d3.max(c.values, function(v) { return v.spending; }); })
   ]);
 
   svg.append("g")
@@ -153,27 +157,32 @@ d3.csv("data2.csv", function(error, data) {
     .data(cities)
     .enter()
     .append("span")
-    .attr("class", "label")
+    .attr("class", function(d) {
+		if(d.active) {
+			return "label active";
+		} else {
+			return "label";
+		}
+	})
     .text(function(d) { return d.name; });
     
-labels.selectAll(".label")
+  labels.selectAll(".label")
     .on("click", function(d) { 
     // first d.active is undefined than it is set to true
     console.log(d);
     var active   = d.active ? false : true;
     console.log(d);
-    newOpacity = active ? 0 : 1;
+    newOpacity = active ? 1 : 0;
     d3.selectAll("."+d.name.replace(/\s+/g, '').replace(/\./g, ''))
         .transition()
         .style("opacity", newOpacity);
-    if(!active) {
+    if(active) {
         this.style.background='#55ff55';    
     } else {
         this.style.background='#dddddd'
     }
-
     d.active = active;
-});
+	});
     
 
   var city = svg.selectAll(".city")
@@ -185,14 +194,16 @@ labels.selectAll(".label")
   city.append("path")
       .attr("class", function(d) { return "line " + d.name.replace(/\s+/g, '').replace(/\./g, ''); })
       .attr("d", function(d) { return line(d.values); })
-      .style("stroke", function(d) { return color(d.name); });
+      .style("stroke", function(d) { return color(d.name); })
+	  .style("opacity", 0);
 
   city.append("text")
       .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-      .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.temperature) + ")"; })
+      .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.spending) + ")"; })
       .attr("x", 3)
       .attr("dy", ".35em")
       .attr("class", function(d) { return d.name.replace(/\s+/g, '').replace(/\./g, '').replace(/\./g, ''); })
+	  .style("opacity", 0)
       .text(function(d) { return d.name; });
 });
 
