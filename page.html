@@ -39,6 +39,10 @@ body {
     font-size: 10px;
     margin-left: 2px;
 }
+
+.active {
+	background-color: #55ff55;
+}
     
 .label:hover {
     background-color: white;
@@ -53,7 +57,7 @@ body {
     
 /* ********* PreWork ************* */
     
-var global_data, global_cities;
+var global_data, cities_display;
 
 var margin = {top: 20, right: 80, bottom: 30, left: 50};
 
@@ -86,7 +90,7 @@ var line = d3.svg.line()
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-  .append("g")
+    .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
 var labels = d3.select("body").append("div")
@@ -107,7 +111,7 @@ d3.csv("data2.csv", function(error, data) {
   // check for every key in object data[0] if it is !== "date" if yes add it otherwise ignore it
   color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
 
-    var yearArray = [];
+  var yearArray = [];
   data.forEach(function(d) {
     d.date = +(d.date);
     yearArray.push(d.date);
@@ -116,26 +120,27 @@ d3.csv("data2.csv", function(error, data) {
   // https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Array/map
   var cities = color.domain().map(function(name) {
     return {
-      active: false,
+      active: (name.split(',')[0]==="Adlikon")?true:false,
       name: name.split(',')[0],
       values: data.map(function(d) {
         return {date: d.date, spending: +d[name]};
       })
     };
   });
+  //cities[0].active = true;
 
-  // TODO: delete after developement
-  global_cities = cities;
+  // TODO: delete after develope
+  cities_display = cities;
   //x.domain(d3.extent(data, function(d) { return d.date; }));
   x.domain([
-      d3.min(data, function(d) {return d.date; }),
-      d3.max(data, function(d) {return d.date; })
+      d3.min(yearArray, function(d) {return d; }),
+      d3.max(yearArray, function(d) {return d; })
   ]);
   xAxis.tickValues(yearArray);
         
   y.domain([
-    d3.min(cities, function(c) { return d3.min(c.values, function(v) { return v.spending; }); }),
-    d3.max(cities, function(c) { return d3.max(c.values, function(v) { return v.spending; }); })
+    d3.min(cities, function(c) { if(c.active) {return d3.min(c.values, function(v) { return v.spending; });} }),
+    d3.max(cities, function(c) { if(c.active) {return d3.max(c.values, function(v) { return v.spending; });} })
   ]);
 
   svg.append("g")
@@ -159,8 +164,9 @@ d3.csv("data2.csv", function(error, data) {
     .append("span")
     .attr("class", function(d) {
 		if(d.active) {
-			return "label active";
-		} else {
+			return "active label";
+		}
+		else {
 			return "label";
 		}
 	})
@@ -177,14 +183,13 @@ d3.csv("data2.csv", function(error, data) {
         .transition()
         .style("opacity", newOpacity);
     if(active) {
-        this.style.background='#55ff55';    
+        this.classList.add("active");   
     } else {
-        this.style.background='#dddddd'
+        this.classList.remove("active");   
     }
     d.active = active;
 	});
     
-
   var city = svg.selectAll(".city")
       .data(cities)
       .enter()
@@ -195,16 +200,16 @@ d3.csv("data2.csv", function(error, data) {
       .attr("class", function(d) { return "line " + d.name.replace(/\s+/g, '').replace(/\./g, ''); })
       .attr("d", function(d) { return line(d.values); })
       .style("stroke", function(d) { return color(d.name); })
-	  .style("opacity", 0);
+	  .style("opacity", function(d) { return d.active?1:0; });
 
   city.append("text")
-      .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+      .datum(function(d) { return {active: d.active, name: d.name, value: d.values[d.values.length - 1]}; })
       .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.spending) + ")"; })
       .attr("x", 3)
       .attr("dy", ".35em")
       .attr("class", function(d) { return d.name.replace(/\s+/g, '').replace(/\./g, '').replace(/\./g, ''); })
-	  .style("opacity", 0)
-      .text(function(d) { return d.name; });
+      .text(function(d) { return d.name; })
+	  .style("opacity", function(d) { return d.active?1:0; });
 });
 
 </script>
