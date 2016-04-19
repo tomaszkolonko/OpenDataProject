@@ -4,50 +4,54 @@
 <meta charset="utf-8">
 <style>
 
-/* ********* CSS ************* */
+    /* ********* CSS ************* */
+
+    body {
+      font: 10px sans-serif;
+    }
+
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+    }
+
+    .line { background-color: aqua;
+        font-size: 20px;
+    }
+
+    .line {
+        fill: none;
+        stroke: steelblue;
+        stroke-width: 1.5px;
+    }
+
+    .label {
+        background-color: #dddddd;
+        border: 1px solid black;
+        border-radius: 10px;
+        color: black;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 10px;
+        margin-left: 2px;
+    }
+
+    .active {
+        background-color: #55ff55;
+    }
+
+    .label:hover {
+        background-color: white;
+        color: black;
+    }
     
-body {
-  font: 10px sans-serif;
-}
-
-.axis path,
-.axis line {
-	fill: none;
-	stroke: #000;
-	shape-rendering: crispEdges;
-}
-   
-.line { background-color: aqua;
-	font-size: 20px;
-}
-
-.line {
-	fill: none;
-	stroke: steelblue;
-	stroke-width: 1.5px;
-}
-
-.label {
-    background-color: #dddddd;
-    border: 1px solid black;
-    border-radius: 10px;
-    color: black;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 10px;
-    margin-left: 2px;
-}
-
-.active {
-	background-color: #55ff55;
-}
-    
-.label:hover {
-    background-color: white;
-    color: black;
-}
+    .label.active:hover {
+        background-color: #44dd44;
+    }
 
 </style>
 <body>
