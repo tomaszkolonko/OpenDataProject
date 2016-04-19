@@ -198,10 +198,24 @@ d3.csv("data2.csv", function(error, data) {
 		d3.max(cities, function(c) { if(c.active) {return d3.max(c.values, function(v) { console.log(v.spending);return v.spending; });} })
 	]);
 
+    // TODO: maybe put it into update function....
 	svg.select(".y.axis").transition().duration(1000).call(yAxis);   
  
 	// TODO: update the transitions with seperate methods.
 	// https://bl.ocks.org/mbostock/3808218
+      
+      city.select("path").data(cities).transition().duration(1000)
+        .attr("d", function(d) { return line(d.values); })
+	    .style("opacity", function(d) { return d.active?1:0; });
+      
+      // TODO: refactoring....
+      city.select("text").data(cities).transition().duration(1000)
+        .attr("transform", function(d) { return "translate(" + x(d.values[d.values.length-1].date) + "," + y(d.values[d.values.length-1].spending) + ")"; })
+        .attr("x", 3)
+        .attr("dy", ".35em")
+      .attr("class", function(d) { return d.name.replace(/\s+/g, '').replace(/\./g, '').replace(/\./g, ''); })
+        .text(function(d) { return d.name; })
+        .style("opacity", function(d) { return d.active?1:0; });
 
 	});
     
