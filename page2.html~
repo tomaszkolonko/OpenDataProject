@@ -102,7 +102,7 @@ var labels = d3.select("body").append("div")
     
 /* ********* Work with DATA ************* */
 
-d3.csv("data2.csv", function(error, data) {
+d3.csv("original.csv", function(error, data) {
   if (error) throw error;
     
   // TODO: delete after developement
@@ -110,27 +110,30 @@ d3.csv("data2.csv", function(error, data) {
     console.log(data);
     
   // https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
-  // !== not equal value or not equal type	
-    
-  // check for every key in object data[0] if it is !== "date" if yes add it otherwise ignore it
-  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
-console.log(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
-
-  var yearArray = [];
+  	
+  var ArrayOfCities = [];
   data.forEach(function(d) {
-    d.date = +(d.date);
-    yearArray.push(d.date);
+	  ArrayOfCities.push(d['GEBIETS_NAME'].split(',')[0].replace(/\s+/g, '').replace(/\./g, ''));
   });
+  color.domain(ArrayOfCities);
+
+  // if identifier except year is of length 4 this code will NOT WORK !!!
+  // TODO: think about refactoring
+  var yearArray = d3.keys(data[0]).filter(function(key) {
+						if(key.length == 4) return key;
+		});
+
 
   // https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Array/map
+  // make one initial true value, leave the rest to false and let the user decide.
   var cities = color.domain().map(function(name) {
     return {
-      active: (name.split(',')[0]==="Adlikon")?true:false,
-      name: name.split(',')[0],
-      values: data.map(function(d) {
-        return {date: d.date, spending: +d[name]};
-      })
-    };
+      active: (name === "Adlikon")?true:false,
+      name: name,
+      values: data.map(function() {
+		return {x:2, y:2};
+	  })
+    };)
   });
   //cities[0].active = true;
 

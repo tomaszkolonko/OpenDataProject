@@ -114,6 +114,7 @@ d3.csv("data2.csv", function(error, data) {
     
   // check for every key in object data[0] if it is !== "date" if yes add it otherwise ignore it
   color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
+global_data = d3.keys(data[0]).filter(function(key) { return key !== "date"; });
 console.log(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
 
   var yearArray = [];
