@@ -1,7 +1,17 @@
 GEFIS_EINHEIT,GEBIETS_NAME,INDIKATOR_NAME,2008,2009,2010,2011,2012,2013,2014
-845200E,"Adlikon, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr.],760013,1034901,881758,891240,970031,1196452,1212699
-813400E,"Adliswil, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr.],27302361,28373118,28045767,29143990,34160916,37374176,35015494
-890400E,"Aesch, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr.],1910458,2063946,2161179,2149516,2378413,2232564,2311525
-891400E,"Aeugst a.A., Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr.],3726317,4015410,3887353,3198585,4053395,3985391,3979310
-891000E,"Affoltern a.A., Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr.],13738398,15541957,14875433,15983606,21841179,21359184,21598113
-BZ8910,"Affoltern, Bezirk",2 Nettoaufwendungen Bildung [Fr.],71626150,78234285,78435288,81753894,103626264,103495092,104188600
+845200E,"Adlikon, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],1331,1787,1528,1539,1726,2088,1991
+813400E,"Adliswil, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],1715,1768,1701,1668,1898,2052,1905
+890400E,"Aesch, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],1936,2062,2090,1985,2054,1887,1956
+891400E,"Aeugst a.A., Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],2192,2312,2134,1674,2069,2023,2039
+891000E,"Affoltern a.A., Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],1292,1452,1345,1435,1939,1883,1872
+BZ8910,"Affoltern, Bezirk",2 Nettoaufwendungen Bildung [Fr./Einw.],1552,1665,1632,1672,2098,2076,2062
+847900E,"Altikon, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],1610,1633,1846,1991,2288,2327,2348
+BZ8450,"Andelfingen, Bezirk",2 Nettoaufwendungen Bildung [Fr./Einw.],1619,1743,1773,1822,2175,2200,2139
+845000E,"Andelfingen, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],2015,2266,2306,1755,1939,1923,1986
+818400E,"Bachenbülach, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],1742,1719,1661,1745,1960,1925,1898
+816400E,"Bachs, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],2123,2232,2223,2826,3600,3036,3027
+834400E,"Bäretswil, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],1476,1458,1456,1488,1934,1962,2004
+830300E,"Bassersdorf, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],1271,1362,1406,1631,1761,2038,1777
+849400E,"Bauma, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],1532,1552,1450,1450,2100,2298,2333
+846300E,"Benken, Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],1750,1795,1821,1871,2194,2385,2075
+841500E,"Berg a.I., Konsolidierte Gemeinde",2 Nettoaufwendungen Bildung [Fr./Einw.],1792,2061,1897,1756,1911,2191,
