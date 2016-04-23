@@ -32,12 +32,12 @@
         border: 1px solid black;
         border-radius: 10px;
         color: black;
-        padding: 10px 20px;
+        padding: 5px 10px;
         text-align: center;
         text-decoration: none;
         display: inline-block;
         font-size: 10px;
-        margin-left: 2px;
+        margin: 2px 2px 0px 0px;
     }
 
     .active {
@@ -184,7 +184,8 @@ d3.csv("original.csv", function(error, data) {
       .attr("y", 0)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("CHF");
+      .text("CHF/Einwohner")
+      .attr("x", 80);
     
   labels.selectAll(".labels")
     .data(cities)
