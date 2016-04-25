@@ -60,8 +60,12 @@
     <script src="./js/topojson.js"></script>
 <script>
 
+    
+    
 /* ********* PreWork ************* */
 
+    
+    
     var global_data, cities_display;
 
     var margin = {top: 20, right: 80, bottom: 30, left: 80};
@@ -105,9 +109,13 @@
     
     var labels = d3.select("body").append("div")
         .attr("class", "labels");
+   
+    
     
     /* ************ map *************** */
 
+    
+    
     var svg_map = d3.select("body").append("svg")
         .attr("width", witdth_map)
         .attr("height", height_map)
@@ -122,7 +130,11 @@
         .attr('transform', 'translate(30,0)');
 		
 
+    
 /* ********* Work with DATA ************* */
+    
+    
+    
 d3.json("map/gemeinden2015Topo_small.json", function(error, topoJson) {
 			
 			////////////////
@@ -161,6 +173,8 @@ d3.json("map/gemeinden2015Topo_small.json", function(error, topoJson) {
 					console.log(d.properties.NAME);
 
 				})
+            
+            
 					
 
 		});
@@ -182,9 +196,8 @@ d3.csv("original.csv", function(error, data) {
         if(key.length == 4) return key;
     });
 
-    function testFunction(current) {
+    function parseToObject(current) {
         var values = [];
-        //var values = [{date: 2008, spending: current['2008']},{date: 2009, spending: current['2009']} ];
         for(var i = 0; i < 7; i++){
             var year = 2008 + i;
             values.push({date: (year), spending: +current[year]});
@@ -193,26 +206,19 @@ d3.csv("original.csv", function(error, data) {
     }
     // https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Array/map
     // make one initial true value, leave the rest to false and let the user decide.
-    var test = [1,2,3,4,5];
     var cities = color.domain().map(function(name) {
         for(var i = 0; i < data.length; i++) {
             if(data[i]['GEBIETS_NAME'].split(',')[0].replace(/\s+/g, '').replace(/\./g, '') == name) {
                 return {
                     active: (name === "Adlikon")?true:false,
                     name: name,
-                    values: testFunction(data[i])
+                    values: parseToObject(data[i])
                 };
             }
         }
 
     });
 
-
-    //cities[0].active = true;
-
-    // TODO: delete after develope
-    cities_display = cities;
-    //x.domain(d3.extent(data, function(d) { return d.date; }));
     x.domain([
         d3.min(yearArray, function(d) { return d; }),
         d3.max(yearArray, function(d) { return d; })
@@ -223,8 +229,6 @@ d3.csv("original.csv", function(error, data) {
         d3.min(cities, function(c) { if(c.active) {return d3.min(c.values, function(v) { return v.spending; });} }),
         d3.max(cities, function(c) { if(c.active) {return d3.max(c.values, function(v) { return v.spending; });} })
     ]);
-
-
 
     svg.append("g")
         .attr("class", "x axis")
