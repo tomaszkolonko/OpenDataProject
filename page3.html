@@ -1,5 +1,3 @@
-<!-- possible way of selecting specific lines http://jsfiddle.net/QBDGB/258/ -->
-
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
@@ -53,6 +51,11 @@
         background-color: #44dd44;
     }
 
+    .see {
+        fill: steelblue;
+        pointer-events: none;
+    }
+
 </style>
 <body>
     <p class="line">Test</p>
@@ -60,19 +63,19 @@
     <script src="./js/topojson.js"></script>
 <script>
 
-    
-    
+
+
 /* ********* PreWork ************* */
 
-    
-    
+
+
     var global_data, cities_display;
 
     var margin = {top: 20, right: 80, bottom: 30, left: 80};
 
     var width = 960 - margin.left - margin.right;
     var height = 500 - margin.top - margin.bottom;
-    
+
     var witdth_map = 572;
     var height_map = 780;
     var scale_map = 0.85;
@@ -106,16 +109,16 @@
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    
+
     var labels = d3.select("body").append("div")
         .attr("class", "labels");
-   
-    
-    
+
+
+
     /* ************ map *************** */
 
-    
-    
+
+
     var svg_map = d3.select("body").append("svg")
         .attr("width", witdth_map)
         .attr("height", height_map)
@@ -124,214 +127,70 @@
         .attr('id', 'map')
         //.attr('transform','translate('+((1 - scale) * width/2)+','+((1 - scale) * mapH/2)+')scale('+scale+')');
         .attr('transform','translate('+0+','+0+')scale('+scale_map+')');
-    
+
     var mapPfade =  map.append("g")
         .attr('id', 'mapPfade')
         .attr('transform', 'translate(30,0)');
-		
 
-    
+
+
 /* ********* Work with DATA ************* */
-    
-    
-    
-d3.json("map/gemeinden2015Topo_small.json", function(error, topoJson) {
-    
-    d3.csv("original.csv", function(error, data) {
-    if (error) throw error;
 
 
-    // https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
-    var ArrayOfCities = [];
-    data.forEach(function(d) {
-        ArrayOfCities.push(d['GEBIETS_NAME'].split(',')[0].replace(/\s+/g, '').replace(/\./g, ''));
-    });
-    color.domain(ArrayOfCities);
 
-    // if identifier except year is of length 4 this code will NOT WORK !!!
-    // TODO: think about refactoring
-    var yearArray = d3.keys(data[0]).filter(function(key) {
-        if(key.length == 4) return key;
-    });
+d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
 
-    function parseToObject(current) {
-        var values = [];
-        for(var i = 0; i < 7; i++){
-            var year = 2008 + i;
-            values.push({date: (year), spending: +current[year]});
-        }
-        return values;
-    }
-    // https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Array/map
-    // make one initial true value, leave the rest to false and let the user decide.
-    var cities = color.domain().map(function(name) {
-        for(var i = 0; i < data.length; i++) {
-            if(data[i]['GEBIETS_NAME'].split(',')[0].replace(/\s+/g, '').replace(/\./g, '') == name) {
-                return {
-                    active: (name === "Adlikon")?true:false,
-                    name: name,
-                    values: parseToObject(data[i])
-                };
-            }
-        }
+                        ////////////////
+                        //      Projektion
+                        var path= d3.geo.path()
+                                        .projection(null)
 
-    });
+                        var gemeindeDaten = topoJson.objects.gemeinden2015.geometries;
+                        ////////////////
+                        //      MIN + Max
 
-    x.domain([
-        d3.min(yearArray, function(d) { return d; }),
-        d3.max(yearArray, function(d) { return d; })
-    ]);
-    xAxis.tickValues(yearArray);
+                        var gemeinden = mapPfade.selectAll('.gemeinden')
+                                .data(topojson.feature(topoJson, topoJson.objects.gemeinden2015).features)
+                                .enter()
+                                .append('path')
+                                .attr("d", path)
+                        //.attr('id', 'bfs'+d.bfs)
+                                .attr("class", function(d) {
+                                        if (d.properties.ART_TEXT == 'See' ){
+                                                return 'see';
+                                        }  else {
+                                                return 'gemeinden';
+                                        }
+                                });
 
-    y.domain([
-        d3.min(cities, function(c) { if(c.active) {return d3.min(c.values, function(v) { return v.spending; });} }),
-        d3.max(cities, function(c) { if(c.active) {return d3.max(c.values, function(v) { return v.spending; });} })
-    ]);
+    // First line
+    // d3.select('bfs'+261).attr('class'. 'selected');
+    // drawLine('bfs261');
 
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+                        d3.selectAll('.gemeinden')
+                .attr('cursor', 'pointer')
+                                .on('click', function(d) {
+                                        var mouseGem = d3.select(this);
+                                        console.log(mouseGem)
+                                        // wichtig: nicht nur mit this arbeiten, sondern mit d3.select(this)
+                                        // d3 selection liefert anderes Objekt zurück als reines javascript this
+                                        // d3.selection beinhaltet databindings!
+                                        // vergleiche mal console.log(d3.select(this)) mit console.log(this);
 
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis)
-        .append("text")
-        .attr("x", 30)
-        .attr("y", 0)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("CHF/Einwohner")
-        .attr("x", 80);
+                                        console.log(d.properties.ind0);
 
-    labels.selectAll(".labels")
-        .data(cities)
-        .enter()
-        .append("span")
-        .attr("class", function(d) {
-            if(d.active) {
-                return "active label";
-            }
-            else {
-                return "label";
-            }
-        })
-        .text(function(d) { return d.name; });
 
-    labels.selectAll(".label")
-        .on("click", function(d) { 
-            var active   = d.active ? false : true;
-            console.log(d);
-            newOpacity = active ? 1 : 0;
-            d3.selectAll("."+d.name.replace(/\s+/g, '').replace(/\./g, ''))
-            .transition()
-            .style("opacity", newOpacity);
-            
-    
-        if(active) {
-            this.classList.add("active");   
-        } else {
-            this.classList.remove("active");   
-        }
-    
-        d.active = active;
+                                        console.log(d.properties.NAME);
 
-        y.domain([
-            d3.min(cities, function(c) { if(c.active) {return d3.min(c.values, function(v) { return v.spending; });} }),
-            d3.max(cities, function(c) { if(c.active) {return d3.max(c.values, function(v) { return v.spending; });} })
-        ]);
 
-        // TODO: maybe put it into update function....
-        svg.select(".y.axis").transition().duration(1000).call(yAxis);   
 
-        // TODO: update the transitions with seperate methods.
-        // https://bl.ocks.org/mbostock/3808218
+                                })
 
-        city.select("path").data(cities).transition().duration(1000)
-            .attr("d", function(d) { return line(d.values); })
-            .style("opacity", function(d) { return d.active?1:0; });
 
-        // TODO: refactoring....
-         city.select("text").data(cities).transition().duration(1000)
-             .attr("transform", function(d) { return "translate(" + x(d.values[d.values.length-1].date) + "," + y(d.values[d.values.length-1].spending) + ")"; })
-            .attr("x", 3)
-            .attr("dy", ".35em")
-            .attr("class", function(d) { return d.name.replace(/\s+/g, '').replace(/\./g, '').replace(/\./g, ''); })
-            .text(function(d) { return d.name; })
-            .style("opacity", function(d) { return d.active?1:0; });
 
-        });
 
-    var city = svg.selectAll(".city")
-        .data(cities)
-        .enter()
-        .append("g")
-        .attr("class", "city");
+                });
 
-    city.append("path")
-        .attr("class", function(d) { return "line " + d.name.replace(/\s+/g, '').replace(/\./g, ''); })
-        .attr("d", function(d) { return line(d.values); })
-        .style("stroke", function(d) { return color(d.name); })
-        .style("opacity", function(d) { return d.active?1:0; });
-
-    city.append("text")
-        .datum(function(d) { return {active: d.active, name: d.name, value: d.values[d.values.length - 1]}; })
-        .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.spending) + ")"; })
-        .attr("x", 3)
-        .attr("dy", ".35em")
-        .attr("class", function(d) { return d.name.replace(/\s+/g, '').replace(/\./g, '').replace(/\./g, ''); })
-        .text(function(d) { return d.name; })
-        .style("opacity", function(d) { return d.active?1:0; });
-    });
-    
-    
-			
-			////////////////
-			//	Projektion
-			var path= d3.geo.path()
-					.projection(null)
-			
-			var gemeindeDaten = topoJson.objects.gemeinden2015.geometries;
-			////////////////
-			//	MIN + Max		
-		
-			var gemeinden = mapPfade.selectAll('.gemeinden')
-				.data(topojson.feature(topoJson, topoJson.objects.gemeinden2015).features)
-				.enter()
-				.append('path')
-				.attr("d", path)
-				.attr("class", function(d) {
-					if (d.properties.ART_TEXT == 'See' ){
-						return 'see';
-					}  else {
-						return 'gemeinden';
-					}
-				});
-
-			d3.selectAll('.gemeinden')
-				.on('mouseover', function(d) {
-					var mouseGem = d3.select(this); 
-					console.log(mouseGem)
-					// wichtig: nicht nur mit this arbeiten, sondern mit d3.select(this)
-					// d3 selection liefert anderes Objekt zurück als reines javascript this
-					// d3.selection beinhaltet databindings!
-					// vergleiche mal console.log(d3.select(this)) mit console.log(this);
-
-					console.log(d);
-
-					console.log(d.properties.NAME);
-                
-                
-
-				})
-            
-            
-					
-
-		});
-    
 
 
 </script>
-
-
