@@ -55,6 +55,11 @@
         fill: steelblue;
         pointer-events: none;
     }
+    
+    .gemeinden {
+      stroke: black;
+      fill: grey;
+    }
 
 </style>
 <body>
@@ -176,11 +181,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                                         // d3 selection liefert anderes Objekt zurück als reines javascript this
                                         // d3.selection beinhaltet databindings!
                                         // vergleiche mal console.log(d3.select(this)) mit console.log(this);
-
-                                        console.log(d.properties.ind0);
-
-
-                                        console.log(d.properties.NAME);
 
 
 
