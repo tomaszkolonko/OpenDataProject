@@ -120,7 +120,7 @@ d3.csv("original.csv", function(error, data) {
   });
   color.domain(ArrayOfCities);
 
-  // if identifier except year is of length 4 this code will NOT WORK !!!
+  // if any identifier except year is of length 4 this code will NOT WORK !!!
   // TODO: think about refactoring
   var yearArray = d3.keys(data[0]).filter(function(key) {
 						if(key.length == 4) return key;
@@ -250,7 +250,7 @@ d3.csv("original.csv", function(error, data) {
 
   city.append("path")
       .attr("class", function(d) { return "line " + d.name.replace(/\s+/g, '').replace(/\./g, ''); })
-      .attr("d", function(d) { return line(d.values); })
+      .attr("d", function(d) { console.log(d.values); return line(d.values); })
       .style("stroke", function(d) { return color(d.name); })
 	  .style("opacity", function(d) { return d.active?1:0; });
 

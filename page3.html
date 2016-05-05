@@ -107,8 +107,9 @@
     // TODO: wont work out of the box anymore
     var line = d3.svg.line()
         .interpolate("basis")
-        .x(function(d) { return x(d.date); })
-        .y(function(d) { return y(d.spending); });
+        .x(function(d) { console.log(d); })
+        .y(function(d) { console.log(d); });
+        //.y(function(d) { return y(d.spending); });
 
     var svg = d3.select("body").append("svg")
         .attr("width", width_graph + margin.left + margin.right)
@@ -229,8 +230,20 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         .append("g")
         .attr("class", "city");
     
+    // TODO JUST FOR TESTING PURPOSES -> EDUCATION IND
+    var indikator = "ind2";
+    var textindikator = "d.properties." + indikator;
+    
+    function cast(o) {
+        var keys = [[index for (index in o)],[o[index] for (index in o)]];
+        console.log(keys);
+        var values = o.values();
+        console.log(values);
+    }
+    
     gemeinden_graph.append("path")
-        .attr("class", function(d) { return "line " + d.properties.NAME; });
+        .attr("class", function(d) { return "line " + d.properties.NAME; })
+        .attr("d", function(d) { console.log(d); return (line(cast(eval("d.properties." + indikator)))); });
 
 
 });
