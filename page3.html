@@ -107,8 +107,8 @@
     // TODO: wont work out of the box anymore
     var line = d3.svg.line()
         .interpolate("basis")
-        .x(function(d) { console.log(d); })
-        .y(function(d) { console.log(d); });
+        .x(function(d) { return x(d.date); })
+        .y(function(d) { return y(d.spending); });
         //.y(function(d) { return y(d.spending); });
 
     var svg = d3.select("body").append("svg")
@@ -235,15 +235,19 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     var textindikator = "d.properties." + indikator;
     
     function cast(o) {
-        var keys = [[index for (index in o)],[o[index] for (index in o)]];
-        console.log(keys);
-        var values = o.values();
-        console.log(values);
+        var castArray = [];
+        for(var key in o) {
+            var val = o[key];
+            castArray.push({date: +key, spending: +val});
+        }
+        return castArray;
     }
     
     gemeinden_graph.append("path")
         .attr("class", function(d) { return "line " + d.properties.NAME; })
-        .attr("d", function(d) { console.log(d); return (line(cast(eval("d.properties." + indikator)))); });
+        .attr("d", function(d) { return (line(cast(eval("d.properties." + indikator)))); })
+        .style("stroke", function(d) { return color(d.properties.NAME); })
+	   .style("opacity", function(d) { return 1; });
 
 
 });
