@@ -68,10 +68,7 @@
     <script src="./js/topojson.js"></script>
 <script>
 
-
-
 /* ********* PreWork ************* */
-
 
     // use global variables for checking
     var global_data, cities_display;
@@ -120,11 +117,7 @@
     var labels = d3.select("body").append("div")
         .attr("class", "labels");
 
-
-
     /* ************ map *************** */
-
-
 
     var svg_map = d3.select("body").append("svg")
         .attr("width", witdth_map)
@@ -139,12 +132,15 @@
         .attr('id', 'mapPfade')
         .attr('transform', 'translate(30,0)');
 
-
-
 /* ********* Work with DATA ************* */
 
 
 d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
+    
+    
+    // Alle darzustellenden Gemeinden kommen hier rein
+    var aktive_Gemeinden = [];
+    
 
     ////////////////
     //      Projektion
@@ -154,6 +150,10 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     var gemeindeDaten = topoJson.objects.gemeinden2015.geometries;
     var ArrayofYears = d3.keys(gemeindeDaten[0].properties.ind0);
     
+    // TODO nur als Beispiel das erste Element genommen
+    aktive_Gemeinden.push(gemeindeDaten[0]);
+    aktive_Gemeinden.push(gemeindeDaten[1]);
+    // TODO: can't be it...
     console.log(gemeindeDaten);
 
     // adapt domains of x and y
@@ -163,11 +163,22 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     ]);
     xAxis.tickValues(ArrayofYears);
 
-//    y.domain([
-//        d3.min(cities, function(c) { if(c.active) {return d3.min(c.values, function(v) { return v.spending; });} }),
-//        d3.max(cities, function(c) { if(c.active) {return d3.max(c.values, function(v) { return v.spending; });} })
-//    ]);
+    // TODO May not be hardcoded
+    /*
+    console.log("ddd");
+    console.log(d3.min(Object.keys(aktive_Gemeinden[0].properties.ind2).map(function (keys) { return (aktive_Gemeinden[0].properties.ind2[keys])})));
     
+    console.log("fff");
+    console.log(d3.min(aktive_Gemeinden, function(c) { return d3.min(d3.values(c.properties.ind2))}));
+    
+    console.log("eee");
+    console.log(d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(c.properties.ind2))}));
+    */
+    
+    y.domain([
+        d3.min(aktive_Gemeinden, function(c) { return d3.min(d3.values(c.properties.ind2))}),
+        d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(c.properties.ind2))})
+    ]);    
     
     ////////////////
     //      MIN + Max
@@ -225,14 +236,10 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
           .attr("x", 80);
     
     var gemeinden_graph = svg.selectAll(".city")
-        .data(gemeindeDaten)
+        .data(aktive_Gemeinden)
         .enter()
         .append("g")
         .attr("class", "city");
-    
-    // TODO JUST FOR TESTING PURPOSES -> EDUCATION IND
-    var indikator = "ind2";
-    var textindikator = "d.properties." + indikator;
     
     function cast(o) {
         var castArray = [];
@@ -242,7 +249,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         }
         return castArray;
     }
-    
+    var indikator = "ind2";
     gemeinden_graph.append("path")
         .attr("class", function(d) { return "line " + d.properties.NAME; })
         .attr("d", function(d) { return (line(cast(eval("d.properties." + indikator)))); })
