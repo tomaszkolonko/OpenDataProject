@@ -151,10 +151,14 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     var ArrayofYears = d3.keys(gemeindeDaten[0].properties.ind0);
     
     // TODO nur als Beispiel das erste Element genommen
+    
     aktive_Gemeinden.push(gemeindeDaten[0]);
     aktive_Gemeinden.push(gemeindeDaten[1]);
     // TODO: can't be it...
+    console.log("alle Daten");
     console.log(gemeindeDaten);
+    console.log("aktive_Gemeinden");
+    console.log(aktive_Gemeinden);
 
     // adapt domains of x and y
     x.domain([
@@ -163,18 +167,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     ]);
     xAxis.tickValues(ArrayofYears);
 
-    // TODO May not be hardcoded
-    /*
-    console.log("ddd");
-    console.log(d3.min(Object.keys(aktive_Gemeinden[0].properties.ind2).map(function (keys) { return (aktive_Gemeinden[0].properties.ind2[keys])})));
-    
-    console.log("fff");
-    console.log(d3.min(aktive_Gemeinden, function(c) { return d3.min(d3.values(c.properties.ind2))}));
-    
-    console.log("eee");
-    console.log(d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(c.properties.ind2))}));
-    */
-    
     y.domain([
         d3.min(aktive_Gemeinden, function(c) { return d3.min(d3.values(c.properties.ind2))}),
         d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(c.properties.ind2))})
@@ -182,7 +174,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     
     ////////////////
     //      MIN + Max
-
     var gemeinden = mapPfade.selectAll('.gemeinden')
             .data(topojson.feature(topoJson, topoJson.objects.gemeinden2015).features)
             .enter()
@@ -201,16 +192,30 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
 // d3.select('bfs'+261).attr('class'. 'selected');
 // drawLine('bfs261');
 
+    // TODO: at the moment does nothing
     function drawLine(mouseGem) {
         var g_data = mouseGem[0][0].__data__.properties;
         console.log(g_data.NAME);
+    }
+    
+    function checkIfActiveAndRemove(tmpGemeinde) {
+        for(var i = 0; i < aktive_Gemeinden.length; i++) {
+            if(aktive_Gemeinden[i].properties.BFS === tmpGemeinde.properties.BFS) {
+                aktive_Gemeinden.splice(i,1);
+                return true;
+            }
+        }
+        return false;
     }
 
     d3.selectAll('.gemeinden')
             .attr('cursor', 'pointer')
             .on('click', function(d) {
                     var mouseGem = d3.select(this);
-                    console.log(mouseGem)
+                    var tmpGemeinde = mouseGem[0][0].__data__;
+                    if(!checkIfActiveAndRemove(tmpGemeinde)) {
+                        aktive_Gemeinden.push(tmpGemeinde);
+                    }
 
                     drawLine(mouseGem);
                     // wichtig: nicht nur mit this arbeiten, sondern mit d3.select(this)
@@ -241,6 +246,9 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         .append("g")
         .attr("class", "city");
     
+    // casts an object into an array for easier element/element
+    // processing line method.
+    // TODO: check if refactoring ommits it
     function cast(o) {
         var castArray = [];
         for(var key in o) {
@@ -249,12 +257,22 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         }
         return castArray;
     }
+    // TODO use buttons instead
     var indikator = "ind2";
     gemeinden_graph.append("path")
         .attr("class", function(d) { return "line " + d.properties.NAME; })
         .attr("d", function(d) { return (line(cast(eval("d.properties." + indikator)))); })
         .style("stroke", function(d) { return color(d.properties.NAME); })
 	   .style("opacity", function(d) { return 1; });
+    
+    gemeinden_graph.append("text")
+        .datum(function(d) { return {name: d.properties.NAME.split(' ')[0], date: 2014, spending: d.properties.ind2["2014"] }; })
+        .attr("transform", function(d) { return "translate(" + x(d.date) + ","       + y(d.spending) + ")"; })
+        .attr("x", 3)
+        .attr("dy", ".35em")
+        .attr("class", function(d) { return d.name; })
+        .text(function(d) { return d.name; })
+        .style("opacity", 1);
 
 
 });
