@@ -151,14 +151,8 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     var ArrayofYears = d3.keys(gemeindeDaten[0].properties.ind0);
     
     // TODO nur als Beispiel das erste Element genommen
-    
     aktive_Gemeinden.push(gemeindeDaten[0]);
     aktive_Gemeinden.push(gemeindeDaten[1]);
-    // TODO: can't be it...
-    console.log("alle Daten");
-    console.log(gemeindeDaten);
-    console.log("aktive_Gemeinden");
-    console.log(aktive_Gemeinden);
 
     // adapt domains of x and y
     x.domain([
@@ -209,13 +203,33 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     }
 
     d3.selectAll('.gemeinden')
-            .attr('cursor', 'pointer')
-            .on('click', function(d) {
-                    var mouseGem = d3.select(this);
-                    var tmpGemeinde = mouseGem[0][0].__data__;
-                    if(!checkIfActiveAndRemove(tmpGemeinde)) {
-                        aktive_Gemeinden.push(tmpGemeinde);
-                    }
+        .attr('cursor', 'pointer')
+        .on('click', function(d) {
+            var mouseGem = d3.select(this);
+            var tmpGemeinde = mouseGem[0][0].__data__;
+            if(!checkIfActiveAndRemove(tmpGemeinde)) {
+                aktive_Gemeinden.push(tmpGemeinde);
+            }
+
+            y.domain([
+                d3.min(aktive_Gemeinden, function(c) { return d3.min(d3.values(c.properties.ind2))}),
+                d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(c.properties.ind2))})
+            ]);
+
+            svg.select(".y.axis").transition().duration(1000).call(yAxis);
+            
+        
+            gemeinden_graph.selectAll("path")
+                .data(aktive_Gemeinden)
+                .transition()
+                .duration(1000)
+                .attr("d", function(d) { return (line(cast(d.properties.ind2))); });
+        
+        // TODO: can't be it...
+    console.log("alle Daten");
+    console.log(gemeindeDaten);
+    console.log("aktive_Gemeinden");
+    console.log(aktive_Gemeinden);
 
                     drawLine(mouseGem);
                     // wichtig: nicht nur mit this arbeiten, sondern mit d3.select(this)
@@ -257,11 +271,10 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         }
         return castArray;
     }
-    // TODO use buttons instead
-    var indikator = "ind2";
+
     gemeinden_graph.append("path")
         .attr("class", function(d) { return "line " + d.properties.NAME; })
-        .attr("d", function(d) { return (line(cast(eval("d.properties." + indikator)))); })
+        .attr("d", function(d) { return (line(cast(d.properties.ind2))); })
         .style("stroke", function(d) { return color(d.properties.NAME); })
 	   .style("opacity", function(d) { return 1; });
     
