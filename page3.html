@@ -1,76 +1,17 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style>
 
-    /* ********* CSS ************* */
-
-    body {
-      font: 10px sans-serif;
-    }
-
-    .axis path,
-    .axis line {
-        fill: none;
-        stroke: #000;
-        shape-rendering: crispEdges;
-    }
-
-    .line { background-color: aqua;
-        font-size: 20px;
-    }
-
-    .line {
-        fill: none;
-        stroke: steelblue;
-        stroke-width: 1.5px;
-    }
-
-    .label {
-        background-color: #dddddd;
-        border: 1px solid black;
-        border-radius: 10px;
-        color: black;
-        padding: 5px 10px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 10px;
-        margin: 2px 2px 0px 0px;
-    }
-
-    .active {
-        background-color: #55ff55;
-    }
-
-    .label:hover {
-        background-color: white;
-        color: black;
-    }
-
-    .label.active:hover {
-        background-color: #44dd44;
-    }
-
-    .see {
-        fill: steelblue;
-        pointer-events: none;
-    }
-    
-    .gemeinden {
-      stroke: black;
-      fill: grey;
-    }
-
-</style>
 <body>
     <p class="line">Test</p>
     <script src="./js/d3.js"></script>
     <script src="./js/topojson.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
 <script>
 
 /* ********* PreWork ************* */
 
     // use global variables for checking
+    // TODO delete afterwards
     var global_data, cities_display;
 
     var margin = {top: 20, right: 80, bottom: 30, left: 80};
@@ -85,7 +26,6 @@
 
     var x = d3.scale.linear()
         .range([0, width_graph]);
-
 
     var y = d3.scale.linear()
         .range([height_graph, 0]);
@@ -280,9 +220,12 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             //// EXIT NOT USED PATHS ////
             gemeinden_graph.data(aktive_Gemeinden)
                 .exit()
+                .transition()
+                .duration(500)
+                .style("opacity", 0)
                 .remove();
 
-                    drawLine(mouseGem);
+                    
                     // wichtig: nicht nur mit this arbeiten, sondern mit d3.select(this)
                     // d3 selection liefert anderes Objekt zurück als reines javascript this
                     // d3.selection beinhaltet databindings!
