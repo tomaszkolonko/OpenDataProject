@@ -180,6 +180,58 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         .attr("class", function(d) { return d.name; })
         .text(function(d) { return d.name; });
     
+    function updateGraph() {
+            //// UPDATE Y AXIS ////
+            svg_graph.select(".y.axis").transition().duration(800).call(yAxis);
+        
+            //// UPDATE SELECTION ////
+            gemeinden_graph = svg_graph.selectAll(".city");
+            
+            //// UPDATE EXISTING PATHS ////
+            gemeinden_graph.selectAll("path")
+                .transition()
+                .duration(800)
+                .attr("d", function(d) { return (line(cast(d.properties.ind2))); });
+        
+        
+gemeinden_graph.selectAll("text").datum(function(d) { console.log("tester"); console.log(d); return {name: d.name, date: d.date, spending: d.spending }; })
+        .transition().duration(800)
+        .attr("transform", function(d) { return "translate(" + x(d.date) + "," + y(d.spending) + ")"; });
+        
+        
+            //// ENTER NEW PATHS ////
+            gemeinden_graph.data(aktive_Gemeinden)
+                .enter()
+                .append("g")
+                .attr("class", "city")
+                .append("path").attr("class", function(d) { return "line " + d.properties.NAME; })
+                .attr("d", function(d) { return (line(cast(d.properties.ind2))); })
+                .style("stroke", function(d) { return color(d.properties.NAME); })
+                .style("opacity", 0).transition().delay(300).duration(800).style("opacity", 1)
+                .append("text");
+        
+            //// EXIT NOT USED PATHS ////
+            gemeinden_graph.data(aktive_Gemeinden)
+                .exit()
+                .transition()
+                .duration(500)
+                .style("opacity", 0)
+                .remove();
+        
+        
+        
+            gemeinde_graph.selectAll("text")
+                .enter()
+                .attr("class", function(d) { return d.name; });
+    }
+    
+    function updateTextLabels() {
+            //// UPDATE SELECTION ////
+       
+            
+    }
+             
+    
     //// UPDATE ////
     d3.selectAll('.gemeinden')
         .attr('cursor', 'pointer')
@@ -195,35 +247,8 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                 d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(c.properties.ind2))})
             ]);
 
-            //// UPDATE Y AXIS ////
-            svg_graph.select(".y.axis").transition().duration(800).call(yAxis);
-        
-            //// UPDATE SELECTION ////
-            gemeinden_graph = svg_graph.selectAll(".city");
-            
-            //// UPDATE EXISTING PATHS ////
-            gemeinden_graph.selectAll("path")
-                .transition()
-                .duration(800)
-                .attr("d", function(d) { return (line(cast(d.properties.ind2))); });
-        
-            //// ENTER NEW PATHS ////
-            gemeinden_graph.data(aktive_Gemeinden)
-                .enter()
-                .append("g")
-                .attr("class", "city")
-                .append("path").attr("class", function(d) { return "line " + d.properties.NAME; })
-                .attr("d", function(d) { return (line(cast(d.properties.ind2))); })
-                .style("stroke", function(d) { return color(d.properties.NAME); })
-                .style("opacity", 0).transition().delay(300).duration(800).style("opacity", 1);
-        
-            //// EXIT NOT USED PATHS ////
-            gemeinden_graph.data(aktive_Gemeinden)
-                .exit()
-                .transition()
-                .duration(500)
-                .style("opacity", 0)
-                .remove();
+            updateGraph();
+            updateTextLabels();
 
                     
                     // wichtig: nicht nur mit this arbeiten, sondern mit d3.select(this)
