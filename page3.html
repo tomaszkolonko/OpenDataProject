@@ -106,9 +106,8 @@
         .interpolate("basis")
         .x(function(d) { return x(d.date); })
         .y(function(d) { return y(d.spending); });
-        //.y(function(d) { return y(d.spending); });
 
-    var svg = d3.select("body").append("svg")
+    var svg_graph = d3.select("body").append("svg")
         .attr("width", width_graph + margin.left + margin.right)
         .attr("height", height_graph + margin.top + margin.bottom)
         .append("g")
@@ -146,7 +145,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     //      Projektion
     var path= d3.geo.path()
             .projection(null)
-
+    
     var gemeindeDaten = topoJson.objects.gemeinden2015.geometries;
     var ArrayofYears = d3.keys(gemeindeDaten[0].properties.ind0);
     
@@ -189,7 +188,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     // TODO: at the moment does nothing
     function drawLine(mouseGem) {
         var g_data = mouseGem[0][0].__data__.properties;
-        console.log(g_data.NAME);
+        //console.log(g_data.NAME);
     }
     
     function checkIfActiveAndRemove(tmpGemeinde) {
@@ -202,48 +201,14 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         return false;
     }
 
-    d3.selectAll('.gemeinden')
-        .attr('cursor', 'pointer')
-        .on('click', function(d) {
-            var mouseGem = d3.select(this);
-            var tmpGemeinde = mouseGem[0][0].__data__;
-            if(!checkIfActiveAndRemove(tmpGemeinde)) {
-                aktive_Gemeinden.push(tmpGemeinde);
-            }
-
-            y.domain([
-                d3.min(aktive_Gemeinden, function(c) { return d3.min(d3.values(c.properties.ind2))}),
-                d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(c.properties.ind2))})
-            ]);
-
-            svg.select(".y.axis").transition().duration(1000).call(yAxis);
-            
-        
-            gemeinden_graph.selectAll("path")
-                .data(aktive_Gemeinden)
-                .transition()
-                .duration(1000)
-                .attr("d", function(d) { return (line(cast(d.properties.ind2))); });
-        
-        // TODO: can't be it...
-    console.log("alle Daten");
-    console.log(gemeindeDaten);
-    console.log("aktive_Gemeinden");
-    console.log(aktive_Gemeinden);
-
-                    drawLine(mouseGem);
-                    // wichtig: nicht nur mit this arbeiten, sondern mit d3.select(this)
-                    // d3 selection liefert anderes Objekt zurück als reines javascript this
-                    // d3.selection beinhaltet databindings!
-                    // vergleiche mal console.log(d3.select(this)) mit console.log(this);
-            })
     
-    svg.append("g")
+    
+    svg_graph.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + height_graph + ")")
           .call(xAxis);
 
-    svg.append("g")
+    svg_graph.append("g")
           .attr("class", "y axis")
           .call(yAxis)
           .append("text")
@@ -254,7 +219,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
           .text("CHF/Einwohner")
           .attr("x", 80);
     
-    var gemeinden_graph = svg.selectAll(".city")
+    var gemeinden_graph = svg_graph.selectAll(".city")
         .data(aktive_Gemeinden)
         .enter()
         .append("g")
@@ -284,8 +249,57 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         .attr("x", 3)
         .attr("dy", ".35em")
         .attr("class", function(d) { return d.name; })
-        .text(function(d) { return d.name; })
-        .style("opacity", 1);
+        .text(function(d) { return d.name; });
+    
+    //// UPDATE ////
+    d3.selectAll('.gemeinden')
+        .attr('cursor', 'pointer')
+        .on('click', function(d) {
+            var mouseGem = d3.select(this);
+            var tmpGemeinde = mouseGem[0][0].__data__;
+            if(!checkIfActiveAndRemove(tmpGemeinde)) {
+                aktive_Gemeinden.push(tmpGemeinde);
+            }
+
+            y.domain([
+                d3.min(aktive_Gemeinden, function(c) { return d3.min(d3.values(c.properties.ind2))}),
+                d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(c.properties.ind2))})
+            ]);
+
+            svg_graph.select(".y.axis").transition().duration(800).call(yAxis);
+            // UPDATE //
+            gemeinden_graph = svg_graph.selectAll(".city");
+            //gemeinden_graph.transition().duration(1000).attr("d", function(d) { console.log(d.properties.NAME); console.log(line(cast(d.properties.ind2))); return (line(cast(d.properties.ind2))); });
+            // ENTER //
+            //svg_graph.selectAll(".city").data(aktive_Gemeinden).enter().append("g").attr("class", "city");
+        
+        //svg_graph.enter().append("g").attr("class", "city");
+            
+            //// UPDATE EXISTING ////
+            gemeinden_graph.selectAll("path")
+                .transition()
+                .duration(800)
+                .attr("d", function(d) { return (line(cast(d.properties.ind2))); });
+        
+            //// ENTER FUNCTION ////
+            gemeinden_graph.data(aktive_Gemeinden)
+                .enter()
+                .append("g")
+                .attr("class", "city")
+                .append("path").attr("class", function(d) { return "line " + d.properties.NAME; })
+                .attr("d", function(d) { return (line(cast(d.properties.ind2))); })
+                .style("stroke", function(d) { return color(d.properties.NAME); })
+                .style("opacity", 0).transition().delay(300).duration(800).style("opacity", 1);
+        
+            //// EXIT FUNCTION ////
+            gemeinden_graph.data(aktive_Gemeinden).exit().remove();
+
+                    drawLine(mouseGem);
+                    // wichtig: nicht nur mit this arbeiten, sondern mit d3.select(this)
+                    // d3 selection liefert anderes Objekt zurück als reines javascript this
+                    // d3.selection beinhaltet databindings!
+                    // vergleiche mal console.log(d3.select(this)) mit console.log(this);
+            })
 
 
 });

@@ -217,8 +217,8 @@ d3.csv("original.csv", function(error, data) {
 	d.active = active;
 
 	y.domain([
-		d3.min(cities, function(c) { if(c.active) {return d3.min(c.values, function(v) { console.log(v.spending);return v.spending; });} }),
-		d3.max(cities, function(c) { if(c.active) {return d3.max(c.values, function(v) { console.log(v.spending);return v.spending; });} })
+		d3.min(cities, function(c) { if(c.active) {return d3.min(c.values, function(v) { return v.spending; });} }),
+		d3.max(cities, function(c) { if(c.active) {return d3.max(c.values, function(v) { return v.spending; });} })
 	]);
 
     // TODO: maybe put it into update function....
