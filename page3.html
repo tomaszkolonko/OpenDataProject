@@ -173,33 +173,34 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
 	    .style("opacity", function(d) { return 1; });
     
     gemeinden_graph.append("text")
-        .datum(function(d) { return {name: d.properties.NAME.split(' ')[0], date: 2014, spending: d.properties.ind2["2014"] }; })
-        .attr("transform", function(d) { return "translate(" + x(d.date) + "," + y(d.spending) + ")"; })
+        //.datum(function(d) { return {name: d.properties.NAME.split(' ')[0], date: 2014, spending: d.properties.ind2["2014"] }; })
+        .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(d.properties.ind2["2014"]) + ")"; })
         .attr("x", 3)
         .attr("dy", ".35em")
-        .attr("class", function(d) { return d.name; })
-        .text(function(d) { return d.name; });
+        .attr("class", function(d) { return d.properties.NAME.split(" ")[0]; })
+        .text(function(d) { return d.properties.NAME.split(" ")[0]; });
     
     function updateGraph() {
             //// UPDATE Y AXIS ////
             svg_graph.select(".y.axis").transition().duration(800).call(yAxis);
-        
-            //// UPDATE SELECTION ////
-            gemeinden_graph = svg_graph.selectAll(".city");
             
+            //// UPDATE SELECTION ////
+            gemeinden_graph = svg_graph.selectAll(".city").data(aktive_Gemeinden);
+        
             //// UPDATE EXISTING PATHS ////
             gemeinden_graph.selectAll("path")
-                //.transition()
-                //.duration(800)
-                .attr("d", function(d) { return (line(cast(d.properties.ind2))); });
+                .transition()
+                .duration(800)
+                .attr("d", function(d) { console.log("->"); console.log(d.properties.ind2); return (line(cast(d.properties.ind2))); });
         
             //// UPDATE EXISTING LABELS ////
-            gemeinden_graph.selectAll("text").data(aktive_Gemeinden)
-                //.transition().duration(800)
-                .attr("transform", function(d) { console.log(aktive_Gemeinden); console.log(d); return "translate(" + x(2014) + "," + y(d.properties.ind2["2014"]) + ")"; });
+            gemeinden_graph.selectAll("text")
+                .transition()
+                .duration(800)
+                .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(d.properties.ind2["2014"]) + ")"; });
         
             //// ENTER NEW PATHS ////
-            var newEntry = gemeinden_graph.data(aktive_Gemeinden)
+            var newEntry = gemeinden_graph
                 .enter()
                 .append("g")
                 .attr("class", "city");
@@ -207,38 +208,52 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                 .attr("d", function(d) { return (line(cast(d.properties.ind2))); })
                 .style("stroke", function(d) { return color(d.properties.NAME); })
                 .style("opacity", 0)
-                //.transition().delay(300).duration(800)
+                .transition().delay(300).duration(800)
                 .style("opacity", 1);
             newEntry.append("text")
-                .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(d.properties.ind2["2014"]) + ")"; })
                 .style("opacity", 0)
-                //.transition().delay(300).duration(800)
-                .style("opacity", 1)
+                .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(d.properties.ind2["2014"]) + ")"; })
                 .attr("class", function(d) { return d.properties.NAME; })
+                .text(function(d) { return d.properties.NAME; })
                 .attr("x", 3)
                 .attr("dy", ".35em")
-                .text(function(d) { return d.properties.NAME; });
+                .style("opacity", 1)
+                .transition().duration(800)
+                .style("opacity", 1);
+                
         
         
             //// EXIT NOT USED PATHS ////
-            gemeinden_graph.data(aktive_Gemeinden)
+            gemeinden_graph
                 .exit()
-                //.transition()
-                //.duration(500)
+                .transition()
+                .duration(500)
                 .style("opacity", 0)
                 .remove();
-        
-         gemeinden_graph.selectAll("text")
+        /*
+         gemeinden_graph.selectAll("text").data(aktive_Gemeinden)
                 .enter()
+                .append("g")
                 .attr("class", function(d) { return d.name; });
         
-        
+        */
     
     }
     
     function updateTextLabels() {
             //// UPDATE SELECTION ////
-       
+        
+        
+       gemeinden_graph = svg_graph.selectAll(".city").data(aktive_Gemeinden);
+        
+        console.log(aktive_Gemeinden);
+        gemeinden_graph.selectAll("text")
+                //.datum(function(d) { return {name: d.properties.NAME.split(' ')[0], date: 2014, spending: d.properties.ind2["2014"] }; })
+                .transition()
+                .duration(800)
+                .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(d.properties.ind2["2014"]) + ")"; });
+        
+        //gemeinden_graph.selectAll("text").enter().append("g")
             
     }
              
@@ -259,6 +274,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             ]);
 
             updateGraph();
+            updateTextLabels();
 
                     
                     // wichtig: nicht nur mit this arbeiten, sondern mit d3.select(this)
