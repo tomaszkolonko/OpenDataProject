@@ -170,11 +170,11 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         .attr("class", function(d) { return "line " + d.properties.NAME; })
         .attr("d", function(d) { return (line(cast(d.properties.ind2))); })
         .style("stroke", function(d) { return color(d.properties.NAME); })
-	   .style("opacity", function(d) { return 1; });
+	    .style("opacity", function(d) { return 1; });
     
     gemeinden_graph.append("text")
         .datum(function(d) { return {name: d.properties.NAME.split(' ')[0], date: 2014, spending: d.properties.ind2["2014"] }; })
-        .attr("transform", function(d) { return "translate(" + x(d.date) + ","       + y(d.spending) + ")"; })
+        .attr("transform", function(d) { return "translate(" + x(d.date) + "," + y(d.spending) + ")"; })
         .attr("x", 3)
         .attr("dy", ".35em")
         .attr("class", function(d) { return d.name; })
@@ -189,40 +189,51 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             
             //// UPDATE EXISTING PATHS ////
             gemeinden_graph.selectAll("path")
-                .transition()
-                .duration(800)
+                //.transition()
+                //.duration(800)
                 .attr("d", function(d) { return (line(cast(d.properties.ind2))); });
         
-        
-gemeinden_graph.selectAll("text").datum(function(d) { console.log("tester"); console.log(d); return {name: d.name, date: d.date, spending: d.spending }; })
-        .transition().duration(800)
-        .attr("transform", function(d) { return "translate(" + x(d.date) + "," + y(d.spending) + ")"; });
-        
+            //// UPDATE EXISTING LABELS ////
+            gemeinden_graph.selectAll("text").data(aktive_Gemeinden)
+                //.transition().duration(800)
+                .attr("transform", function(d) { console.log(aktive_Gemeinden); console.log(d); return "translate(" + x(2014) + "," + y(d.properties.ind2["2014"]) + ")"; });
         
             //// ENTER NEW PATHS ////
-            gemeinden_graph.data(aktive_Gemeinden)
+            var newEntry = gemeinden_graph.data(aktive_Gemeinden)
                 .enter()
                 .append("g")
-                .attr("class", "city")
-                .append("path").attr("class", function(d) { return "line " + d.properties.NAME; })
+                .attr("class", "city");
+            newEntry.append("path").attr("class", function(d) { return "line " + d.properties.NAME; })
                 .attr("d", function(d) { return (line(cast(d.properties.ind2))); })
                 .style("stroke", function(d) { return color(d.properties.NAME); })
-                .style("opacity", 0).transition().delay(300).duration(800).style("opacity", 1)
-                .append("text");
+                .style("opacity", 0)
+                //.transition().delay(300).duration(800)
+                .style("opacity", 1);
+            newEntry.append("text")
+                .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(d.properties.ind2["2014"]) + ")"; })
+                .style("opacity", 0)
+                //.transition().delay(300).duration(800)
+                .style("opacity", 1)
+                .attr("class", function(d) { return d.properties.NAME; })
+                .attr("x", 3)
+                .attr("dy", ".35em")
+                .text(function(d) { return d.properties.NAME; });
+        
         
             //// EXIT NOT USED PATHS ////
             gemeinden_graph.data(aktive_Gemeinden)
                 .exit()
-                .transition()
-                .duration(500)
+                //.transition()
+                //.duration(500)
                 .style("opacity", 0)
                 .remove();
         
-        
-        
-            gemeinde_graph.selectAll("text")
+         gemeinden_graph.selectAll("text")
                 .enter()
                 .attr("class", function(d) { return d.name; });
+        
+        
+    
     }
     
     function updateTextLabels() {
@@ -248,7 +259,6 @@ gemeinden_graph.selectAll("text").datum(function(d) { console.log("tester"); con
             ]);
 
             updateGraph();
-            updateTextLabels();
 
                     
                     // wichtig: nicht nur mit this arbeiten, sondern mit d3.select(this)
