@@ -217,8 +217,9 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                 .text(function(d) { return d.properties.NAME; })
                 .attr("x", 3)
                 .attr("dy", ".35em")
-                .style("opacity", 1)
-                .transition().duration(800)
+                //.style("opacity", 0)
+                //.transition().duration(800) // CONFLICTS WITH UPPER TRANSITION
+                // second style attribute never run since transition stopped
                 .style("opacity", 1);
                 
         
@@ -230,13 +231,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                 .duration(500)
                 .style("opacity", 0)
                 .remove();
-        /*
-         gemeinden_graph.selectAll("text").data(aktive_Gemeinden)
-                .enter()
-                .append("g")
-                .attr("class", function(d) { return d.name; });
-        
-        */
     
     }
     
