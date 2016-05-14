@@ -173,7 +173,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
 	    .style("opacity", function(d) { return 1; });
     
     gemeinden_graph.append("text")
-        //.datum(function(d) { return {name: d.properties.NAME.split(' ')[0], date: 2014, spending: d.properties.ind2["2014"] }; })
         .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(d.properties.ind2["2014"]) + ")"; })
         .attr("x", 3)
         .attr("dy", ".35em")
@@ -222,9 +221,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                 // second style attribute never run since transition stopped
                 .style("opacity", 1);
                 
-        
-        
-            //// EXIT NOT USED PATHS ////
+            //// EXIT NOT USED CITIES ////
             gemeinden_graph
                 .exit()
                 .transition()
@@ -234,11 +231,12 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     
     }
     
+    // AT THE MOMENT NOT USED: maybe to solve the transition problem....
     function updateTextLabels() {
             //// UPDATE SELECTION ////
         
-        
-       gemeinden_graph = svg_graph.selectAll(".city").data(aktive_Gemeinden);
+        // AT THE MOMENT NOT USED: maybe to solve the transition problem....
+        gemeinden_graph = svg_graph.selectAll(".city").data(aktive_Gemeinden);
         
         console.log(aktive_Gemeinden);
         gemeinden_graph.selectAll("text")
@@ -251,7 +249,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             
     }
              
-    
     //// UPDATE ////
     d3.selectAll('.gemeinden')
         .attr('cursor', 'pointer')
@@ -268,7 +265,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             ]);
 
             updateGraph();
-            updateTextLabels();
+            //updateTextLabels();
 
                     
                     // wichtig: nicht nur mit this arbeiten, sondern mit d3.select(this)
