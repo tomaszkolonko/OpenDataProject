@@ -208,20 +208,40 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             }
         
         //// TODO //// MAKE THE CALCULATION YOURSELF
+        console.log("self calculation"); console.log(aktive_Gemeinden);
+        var lowest = 1000000;
+        var highest = 0;
+        for(var i = 0; i < aktive_Gemeinden.length; i++) {
+            var indikatorPath = "aktive_Gemeinden[" + i + "].properties." + indikator;
+            var vals = Object.keys(eval(indikatorPath)).map(function (key) {
+                return +eval(indikatorPath + "[key]");
+            });
+            
+            console.log(vals);
+            var low = Math.min.apply(null, vals);
+            var high = Math.max.apply(null, vals);
+            
+            console.log("low:" + low);
+            console.log("high:" + high);
+            
+            if(lowest > low) {
+                lowest = low;
+            }
+            if(highest < high) {
+                highest = high;
+            }
+        }
         
-        y.domain([
-                d3.min(aktive_Gemeinden, function(c) { console.log(d3.min(d3.values(eval("c.properties." + indikator)))); return d3.min(d3.values(eval("c.properties." + indikator)))}),
-                d3.max(aktive_Gemeinden, function(c) { console.log(d3.max(d3.values(eval("c.properties." + indikator)))); return d3.max(d3.values(eval("c.properties." + indikator)))})
-            ]);
+        console.log("lowest: " + lowest);
+        console.log("highest: " + highest);
+        
+        y.domain([lowest,highest]);
         
         console.log("min"); console.log(d3.min(aktive_Gemeinden, function(c) { return d3.min(d3.values(eval("c.properties." + indikator)))}));
         console.log("max"); console.log(d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(eval("c.properties." + indikator)))}));
         
             var chooseCorrectIndikator = "d.properties." + indikator;
             var chooseCorrectSpendingForText = "d.properties." + indikator + "['2014']";
-        
-            console.log("chooseCorrectIndikator"); console.log(chooseCorrectIndikator);
-            console.log("chooseCorrectSpendingForText"); console.log(chooseCorrectSpendingForText);
         
             //// UPDATE Y AXIS ////
             svg_graph.select(".y.axis").transition().duration(800).call(yAxis);
