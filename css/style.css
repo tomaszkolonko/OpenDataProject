@@ -39,6 +39,7 @@ svg {
 .button {
     background-color: #4CAF50; /* Green */
     border: none;
+    border-radius: 10px;
     color: white;
     padding: 12px 22px;
     text-align: center;
@@ -62,7 +63,7 @@ svg {
     color: white;
 }
 
-.indikatorButton:acitve {
+.activeIndikator {
     background-color: #4CAF50;
     color: white;
 }
@@ -77,7 +78,7 @@ svg {
     color: white;
 }
 
-.yearButton:active {
+.activeYear {
     background-color: #008CBA;
     color: white;
 }

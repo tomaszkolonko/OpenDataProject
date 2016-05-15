@@ -7,12 +7,12 @@
     <a id="2010" class="button yearButton">2010</a>
     <a id="2011" class="button yearButton">2011</a>
     <a id="2012" class="button yearButton">2012</a>
-    <a id="2013" class="button yearButton">2013</a>
+    <a id="2013" class="button activeYear yearButton">2013</a>
     <a id="2014" class="button yearButton">2014</a>
     <span style="padding-left:100px"></span>
     <a id="ind0" class="button indikatorButton">ind0</a>
     <a id="ind1" class="button indikatorButton">ind1</a>
-    <a id="ind2" class="button indikatorButton">ind2</a>
+    <a id="ind2" class="button indikatorButton activeIndikator">ind2</a>
     <a id="ind3" class="button indikatorButton">ind3</a>
     <a id="ind4" class="button indikatorButton">ind4</a>
     <a id="ind5" class="button indikatorButton">ind5</a>
@@ -207,8 +207,19 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     ////////////////////////////////
     
     function updateGraph(indi) {
+            //// INDICATOR ////
             if(indi !== "none") {
                 indikator = indi;
+                var button = d3.selectAll(".indikatorButton");
+                for(var i = 0; i < button[0].length; i++) {
+                    console.log(button[0][i].className + " -> " + button[0][i].id);
+                    if(button[0][i].className.indexOf("activeIndikator")) {
+                        button[0][i].classList.remove("activeIndikator");
+                    }
+                    if(button[0][i].id === indikator) {
+                        button[0][i].classList.add("activeIndikator");
+                    }
+                }
             }
         
         //// MAKE THE CALCULATION YOURSELF d3 leads to errors ////
@@ -291,9 +302,16 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     
     }
     
+    ////////////////////////////////////
+    //// SET GRAPH TO NEW INDICATOR ////
+    ////////////////////////////////////
+    
     d3.select("body").selectAll(".indikatorButton").on("click", function(d) {
         updateGraph(d3.select(this)[0][0].id);
     });
+    
+    
+    
     
     // AT THE MOMENT NOT USED: maybe to solve the transition problem....
     function updateTextLabels() {
