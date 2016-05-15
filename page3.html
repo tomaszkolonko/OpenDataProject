@@ -3,6 +3,14 @@
 
 <body>
     <p class="line">Test</p>
+    <a id="ind0" class="myButton">ind0</a>
+    <a id="ind1" class="myButton">ind1</a>
+    <a id="ind2" class="myButton">ind2</a>
+    <a id="ind3" class="myButton">ind3</a>
+    <a id="ind4" class="myButton">ind4</a>
+    <a id="ind5" class="myButton">ind5</a>
+    <a id="ind6" class="myButton">ind6</a>
+    <a id="ind7" class="myButton">ind7</a>
     <script src="./js/d3.js"></script>
     <script src="./js/topojson.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css">
@@ -13,6 +21,10 @@
     // use global variables for checking
     // TODO delete afterwards
     var global_data, cities_display;
+    
+    // Default Value
+    // TODO should be an empty at beginning
+    var indikator = "ind2";
 
     var margin = {top: 20, right: 80, bottom: 30, left: 80};
 
@@ -40,6 +52,24 @@
     var yAxis = d3.svg.axis()
         .scale(y)
         .orient("left");
+    
+    var buttons = d3.select("body").append("div")
+    .attr("class", "buttons");
+    
+    /* ************ map *************** */
+
+    var svg_map = d3.select("body").append("svg")
+        .attr("width", witdth_map)
+        .attr("height", height_map)
+
+    var map =  svg_map.append("g")
+        .attr('id', 'map')
+        //.attr('transform','translate('+((1 - scale) * width/2)+','+((1 - scale) * mapH/2)+')scale('+scale+')');
+        .attr('transform','translate('+0+','+0+')scale('+scale_map+')');
+
+    var mapPfade =  map.append("g")
+        .attr('id', 'mapPfade')
+        .attr('transform', 'translate(30,0)');
 
     // TODO: wont work out of the box anymore
     var line = d3.svg.line()
@@ -56,21 +86,6 @@
     var labels = d3.select("body").append("div")
         .attr("class", "labels");
 
-    /* ************ map *************** */
-
-    var svg_map = d3.select("body").append("svg")
-        .attr("width", witdth_map)
-        .attr("height", height_map)
-
-    var map =  svg_map.append("g")
-        .attr('id', 'map')
-        //.attr('transform','translate('+((1 - scale) * width/2)+','+((1 - scale) * mapH/2)+')scale('+scale+')');
-        .attr('transform','translate('+0+','+0+')scale('+scale_map+')');
-
-    var mapPfade =  map.append("g")
-        .attr('id', 'mapPfade')
-        .attr('transform', 'translate(30,0)');
-
 /* ********* Work with DATA ************* */
 
 
@@ -86,6 +101,8 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     
     var gemeindeDaten = topoJson.objects.gemeinden2015.geometries;
     var ArrayofYears = d3.keys(gemeindeDaten[0].properties.ind0);
+    
+    console.log(gemeindeDaten);
     
     // TODO nur als Beispiel das erste Element genommen
     aktive_Gemeinden.push(gemeindeDaten[0]);
@@ -179,7 +196,33 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         .attr("class", function(d) { return d.properties.NAME.split(" ")[0]; })
         .text(function(d) { return d.properties.NAME.split(" ")[0]; });
     
-    function updateGraph() {
+    
+    ////////////////////////////////
+    //// UPDATE THE WHOLE GRAPH ////
+    ////////////////////////////////
+    
+    function updateGraph(indi) {
+            console.log("indi"); console.log(indi);
+            if(indi !== "none") {
+                indikator = indi;
+            }
+        
+        //// TODO //// MAKE THE CALCULATION YOURSELF
+        
+        y.domain([
+                d3.min(aktive_Gemeinden, function(c) { console.log(d3.min(d3.values(eval("c.properties." + indikator)))); return d3.min(d3.values(eval("c.properties." + indikator)))}),
+                d3.max(aktive_Gemeinden, function(c) { console.log(d3.max(d3.values(eval("c.properties." + indikator)))); return d3.max(d3.values(eval("c.properties." + indikator)))})
+            ]);
+        
+        console.log("min"); console.log(d3.min(aktive_Gemeinden, function(c) { return d3.min(d3.values(eval("c.properties." + indikator)))}));
+        console.log("max"); console.log(d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(eval("c.properties." + indikator)))}));
+        
+            var chooseCorrectIndikator = "d.properties." + indikator;
+            var chooseCorrectSpendingForText = "d.properties." + indikator + "['2014']";
+        
+            console.log("chooseCorrectIndikator"); console.log(chooseCorrectIndikator);
+            console.log("chooseCorrectSpendingForText"); console.log(chooseCorrectSpendingForText);
+        
             //// UPDATE Y AXIS ////
             svg_graph.select(".y.axis").transition().duration(800).call(yAxis);
             
@@ -190,13 +233,13 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             gemeinden_graph.selectAll("path")
                 .transition()
                 .duration(800)
-                .attr("d", function(d) { console.log("->"); console.log(d.properties.ind2); return (line(cast(d.properties.ind2))); });
+                .attr("d", function(d) { console.log("->"); console.log(eval(chooseCorrectIndikator)); return (line(cast(eval(chooseCorrectIndikator)))); });
         
             //// UPDATE EXISTING LABELS ////
             gemeinden_graph.selectAll("text")
                 .transition()
                 .duration(800)
-                .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(d.properties.ind2["2014"]) + ")"; });
+                .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(eval(chooseCorrectSpendingForText)) + ")"; });
         
             //// ENTER NEW PATHS ////
             var newEntry = gemeinden_graph
@@ -204,14 +247,14 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                 .append("g")
                 .attr("class", "city");
             newEntry.append("path").attr("class", function(d) { return "line " + d.properties.NAME; })
-                .attr("d", function(d) { return (line(cast(d.properties.ind2))); })
+                .attr("d", function(d) { return (line(cast(eval(chooseCorrectIndikator)))); })
                 .style("stroke", function(d) { return color(d.properties.NAME); })
                 .style("opacity", 0)
                 .transition().delay(300).duration(800)
                 .style("opacity", 1);
             newEntry.append("text")
                 .style("opacity", 0)
-                .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(d.properties.ind2["2014"]) + ")"; })
+                .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(eval(chooseCorrectSpendingForText)) + ")"; })
                 .attr("class", function(d) { return d.properties.NAME; })
                 .text(function(d) { return d.properties.NAME; })
                 .attr("x", 3)
@@ -230,6 +273,10 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                 .remove();
     
     }
+    
+    d3.select("body").selectAll(".myButton").on("click", function(d) {
+        updateGraph(d3.select(this)[0][0].id);
+    });
     
     // AT THE MOMENT NOT USED: maybe to solve the transition problem....
     function updateTextLabels() {
@@ -258,13 +305,8 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             if(!checkIfActiveAndRemove(tmpGemeinde)) {
                 aktive_Gemeinden.push(tmpGemeinde);
             }
-
-            y.domain([
-                d3.min(aktive_Gemeinden, function(c) { return d3.min(d3.values(c.properties.ind2))}),
-                d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(c.properties.ind2))})
-            ]);
-
-            updateGraph();
+            
+            updateGraph("none");
             //updateTextLabels();
 
                     
@@ -274,9 +316,9 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                     // vergleiche mal console.log(d3.select(this)) mit console.log(this);
             })
 
-
 });
 
 
 
 </script>
+</body>
