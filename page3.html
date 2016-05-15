@@ -2,15 +2,22 @@
 <meta charset="utf-8">
 
 <body>
-    <p class="line">Test</p>
-    <a id="ind0" class="myButton">ind0</a>
-    <a id="ind1" class="myButton">ind1</a>
-    <a id="ind2" class="myButton">ind2</a>
-    <a id="ind3" class="myButton">ind3</a>
-    <a id="ind4" class="myButton">ind4</a>
-    <a id="ind5" class="myButton">ind5</a>
-    <a id="ind6" class="myButton">ind6</a>
-    <a id="ind7" class="myButton">ind7</a>
+    <a id="2008" class="button yearButton">2008</a>
+    <a id="2009" class="button yearButton">2009</a>
+    <a id="2010" class="button yearButton">2010</a>
+    <a id="2011" class="button yearButton">2011</a>
+    <a id="2012" class="button yearButton">2012</a>
+    <a id="2013" class="button yearButton">2013</a>
+    <a id="2014" class="button yearButton">2014</a>
+    <span style="padding-left:100px"></span>
+    <a id="ind0" class="button indikatorButton">ind0</a>
+    <a id="ind1" class="button indikatorButton">ind1</a>
+    <a id="ind2" class="button indikatorButton">ind2</a>
+    <a id="ind3" class="button indikatorButton">ind3</a>
+    <a id="ind4" class="button indikatorButton">ind4</a>
+    <a id="ind5" class="button indikatorButton">ind5</a>
+    <a id="ind6" class="button indikatorButton">ind6</a>
+    <a id="ind7" class="button indikatorButton">ind7</a>
     <script src="./js/d3.js"></script>
     <script src="./js/topojson.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css">
@@ -101,8 +108,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     
     var gemeindeDaten = topoJson.objects.gemeinden2015.geometries;
     var ArrayofYears = d3.keys(gemeindeDaten[0].properties.ind0);
-    
-    console.log(gemeindeDaten);
     
     // TODO nur als Beispiel das erste Element genommen
     aktive_Gemeinden.push(gemeindeDaten[0]);
@@ -202,13 +207,12 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     ////////////////////////////////
     
     function updateGraph(indi) {
-            console.log("indi"); console.log(indi);
             if(indi !== "none") {
                 indikator = indi;
             }
         
-        //// TODO //// MAKE THE CALCULATION YOURSELF
-        console.log("self calculation"); console.log(aktive_Gemeinden);
+        //// MAKE THE CALCULATION YOURSELF d3 leads to errors ////
+        
         var lowest = 1000000;
         var highest = 0;
         for(var i = 0; i < aktive_Gemeinden.length; i++) {
@@ -217,12 +221,8 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                 return +eval(indikatorPath + "[key]");
             });
             
-            console.log(vals);
             var low = Math.min.apply(null, vals);
             var high = Math.max.apply(null, vals);
-            
-            console.log("low:" + low);
-            console.log("high:" + high);
             
             if(lowest > low) {
                 lowest = low;
@@ -237,9 +237,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         
         y.domain([lowest,highest]);
         
-        console.log("min"); console.log(d3.min(aktive_Gemeinden, function(c) { return d3.min(d3.values(eval("c.properties." + indikator)))}));
-        console.log("max"); console.log(d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(eval("c.properties." + indikator)))}));
-        
             var chooseCorrectIndikator = "d.properties." + indikator;
             var chooseCorrectSpendingForText = "d.properties." + indikator + "['2014']";
         
@@ -253,7 +250,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             gemeinden_graph.selectAll("path")
                 .transition()
                 .duration(800)
-                .attr("d", function(d) { console.log("->"); console.log(eval(chooseCorrectIndikator)); return (line(cast(eval(chooseCorrectIndikator)))); });
+                .attr("d", function(d) { return (line(cast(eval(chooseCorrectIndikator)))); });
         
             //// UPDATE EXISTING LABELS ////
             gemeinden_graph.selectAll("text")
@@ -294,7 +291,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     
     }
     
-    d3.select("body").selectAll(".myButton").on("click", function(d) {
+    d3.select("body").selectAll(".indikatorButton").on("click", function(d) {
         updateGraph(d3.select(this)[0][0].id);
     });
     
@@ -305,7 +302,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         // AT THE MOMENT NOT USED: maybe to solve the transition problem....
         gemeinden_graph = svg_graph.selectAll(".city").data(aktive_Gemeinden);
         
-        console.log(aktive_Gemeinden);
         gemeinden_graph.selectAll("text")
                 //.datum(function(d) { return {name: d.properties.NAME.split(' ')[0], date: 2014, spending: d.properties.ind2["2014"] }; })
                 .transition()
@@ -325,6 +321,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             if(!checkIfActiveAndRemove(tmpGemeinde)) {
                 aktive_Gemeinden.push(tmpGemeinde);
             }
+        console.log(mouseGem);
             
             updateGraph("none");
             //updateTextLabels();
