@@ -7,17 +7,17 @@
     <a id="2010" class="button yearButton">2010</a>
     <a id="2011" class="button yearButton">2011</a>
     <a id="2012" class="button yearButton">2012</a>
-    <a id="2013" class="button activeYear yearButton">2013</a>
-    <a id="2014" class="button yearButton">2014</a>
+    <a id="2013" class="button yearButton">2013</a>
+    <a id="2014" class="button yearButton activeYear">2014</a>
     <span style="padding-left:100px"></span>
-    <a id="ind0" class="button indikatorButton">ind0</a>
-    <a id="ind1" class="button indikatorButton">ind1</a>
-    <a id="ind2" class="button indikatorButton activeIndikator">ind2</a>
-    <a id="ind3" class="button indikatorButton">ind3</a>
-    <a id="ind4" class="button indikatorButton">ind4</a>
-    <a id="ind5" class="button indikatorButton">ind5</a>
-    <a id="ind6" class="button indikatorButton">ind6</a>
-    <a id="ind7" class="button indikatorButton">ind7</a>
+    <a id="ind0" class="button indikatorButton">Behörden u. allg. Verwaltung</a>
+    <a id="ind1" class="button indikatorButton">Rechtsschutz und Sicherheit</a>
+    <a id="ind2" class="button indikatorButton activeIndikator">Bildung</a>
+    <a id="ind3" class="button indikatorButton">Kultur und Freizeit</a>
+    <a id="ind4" class="button indikatorButton">Gesundheit</a>
+    <a id="ind5" class="button indikatorButton">soz. Wohlfahrt</a>
+    <a id="ind6" class="button indikatorButton">Verkehr</a>
+    <a id="ind7" class="button indikatorButton">Umwelt u. Raumordnung</a>
     <script src="./js/d3.js"></script>
     <script src="./js/topojson.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css">
@@ -32,6 +32,7 @@
     // Default Value
     // TODO should be an empty at beginning
     var indikator = "ind2";
+    var year = "2014";
 
     var margin = {top: 20, right: 80, bottom: 30, left: 80};
 
@@ -302,6 +303,25 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     
     }
     
+    /////////////////////////////////////
+    //// UPDATE COLOR MAPPING ON MAP ////
+    /////////////////////////////////////
+    function updateMap(y) {
+        //// INDICATOR ////
+        year = y;
+        var yearButton = d3.selectAll(".yearButton");
+        for(var i = 0; i < yearButton[0].length; i++) {
+            if(yearButton[0][i].className.indexOf("activeYear")) {
+                yearButton[0][i].classList.remove("activeYear");
+            }
+            if(yearButton[0][i].id == year) {
+                yearButton[0][i].classList.add("activeYear");
+            }
+        }
+        
+        
+    }
+    
     ////////////////////////////////////
     //// SET GRAPH TO NEW INDICATOR ////
     ////////////////////////////////////
@@ -310,7 +330,13 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         updateGraph(d3.select(this)[0][0].id);
     });
     
+    ///////////////////////////////////
+    //// SET MAPCOLORS TO NEW YEAR ////
+    ///////////////////////////////////
     
+    d3.select("body").selectAll(".yearButton").on("click", function(d) {
+        updateMap(+d3.select(this)[0][0].id);
+    })
     
     
     // AT THE MOMENT NOT USED: maybe to solve the transition problem....
