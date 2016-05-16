@@ -154,7 +154,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             })
             .style("fill", function(d) {
                 if(d.properties.ART_TEXT == "Gemeinde" && d.properties[indikator] != null) {
-                    console.log(Math.round(mapColorValues(d.properties[indikator][year])));
                     return "rgb(0," + Math.round(mapColorValues(d.properties[indikator][year])) + ", 0)";
                 } else {
                     return 0;
@@ -233,7 +232,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                 indikator = indi;
                 var button = d3.selectAll(".indikatorButton");
                 for(var i = 0; i < button[0].length; i++) {
-                    console.log(button[0][i].className + " -> " + button[0][i].id);
                     if(button[0][i].className.indexOf("activeIndikator")) {
                         button[0][i].classList.remove("activeIndikator");
                     }
@@ -244,7 +242,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             }
         
         //// MAKE THE CALCULATION YOURSELF d3 leads to errors ////
-        
         var lowest = 1000000;
         var highest = 0;
         for(var i = 0; i < aktive_Gemeinden.length; i++) {
@@ -263,9 +260,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                 highest = high;
             }
         }
-        
-        console.log("lowest: " + lowest);
-        console.log("highest: " + highest);
         
         y.domain([lowest,highest]);
         
@@ -327,8 +321,33 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     //// UPDATE COLOR MAPPING ON MAP ////
     /////////////////////////////////////
     function updateMap(y) {
-        //// INDICATOR ////
-        year = y;
+
+        if(y != 0) {
+            year = y;    
+        }
+        
+        var map_highest = 0;
+        var map_lowest = 10000;
+        
+        for(var index = 0; index < gemeindeDaten.length; index++) {
+            if(gemeindeDaten[index].properties[indikator] != null) {
+                var amount = +gemeindeDaten[index].properties[indikator][year];
+                console.log("amount: " + amount);
+                if(amount > map_highest) {
+                    map_highest = amount;
+                    console.log("map_highest: " + map_highest);
+                }
+                if(amount < map_lowest) {
+                    map_lowest = amount;
+                    console.log("map_lowest: " + map_lowest);
+                }
+            }
+        }
+        
+    
+        console.log("->"); console.log(gemeindeDaten);
+        mapColorValues.domain([map_lowest,map_highest]);
+        
         var yearButton = d3.selectAll(".yearButton");
         for(var i = 0; i < yearButton[0].length; i++) {
             if(yearButton[0][i].className.indexOf("activeYear")) {
@@ -339,8 +358,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             }
         }
         var toBe = "aktive_Gemeinden[gemeindenIndex].properties[indikator][year]";
-        console.log(indikator);
-        console.log(aktive_Gemeinden);
         
         // change the color of all gemeinden
         mapPfade.selectAll('.gemeinden').style("fill", function(d) {
@@ -349,13 +366,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                 } else {
                     return 0;
                 }
-        });
-        
-        for(var gemeindenIndex = 0; gemeindenIndex < aktive_Gemeinden.length; gemeindenIndex++) {
-            console.log("Gemeinde Nr. " + gemeindenIndex);
-            console.log(eval(toBe));
-        } 
-        
+        });        
     }
     
     ////////////////////////////////////
@@ -364,6 +375,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     
     d3.select("body").selectAll(".indikatorButton").on("click", function(d) {
         updateGraph(d3.select(this)[0][0].id);
+        updateMap(0);
     });
     
     ///////////////////////////////////
