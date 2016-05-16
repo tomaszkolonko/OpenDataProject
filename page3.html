@@ -2,22 +2,28 @@
 <meta charset="utf-8">
 
 <body>
-    <a id="2008" class="button yearButton">2008</a>
-    <a id="2009" class="button yearButton">2009</a>
-    <a id="2010" class="button yearButton">2010</a>
-    <a id="2011" class="button yearButton">2011</a>
-    <a id="2012" class="button yearButton">2012</a>
-    <a id="2013" class="button yearButton">2013</a>
-    <a id="2014" class="button yearButton activeYear">2014</a>
+    
+    
+    <div>
+        <a id="ind0" class="button indikatorButton">Behörden u. allg. Verwaltung</a>
+        <a id="ind1" class="button indikatorButton">Rechtsschutz und Sicherheit</a>
+        <a id="ind2" class="button indikatorButton activeIndikator">Bildung</a>
+        <a id="ind3" class="button indikatorButton">Kultur und Freizeit</a>
+        <a id="ind4" class="button indikatorButton">Gesundheit</a>
+        <a id="ind5" class="button indikatorButton">soz. Wohlfahrt</a>
+        <a id="ind6" class="button indikatorButton">Verkehr</a>
+        <a id="ind7" class="button indikatorButton">Umwelt u. Raumordnung</a>
+    </div>
     <span style="padding-left:100px"></span>
-    <a id="ind0" class="button indikatorButton">Behörden u. allg. Verwaltung</a>
-    <a id="ind1" class="button indikatorButton">Rechtsschutz und Sicherheit</a>
-    <a id="ind2" class="button indikatorButton activeIndikator">Bildung</a>
-    <a id="ind3" class="button indikatorButton">Kultur und Freizeit</a>
-    <a id="ind4" class="button indikatorButton">Gesundheit</a>
-    <a id="ind5" class="button indikatorButton">soz. Wohlfahrt</a>
-    <a id="ind6" class="button indikatorButton">Verkehr</a>
-    <a id="ind7" class="button indikatorButton">Umwelt u. Raumordnung</a>
+    <div>
+        <a id="2008" class="button yearButton">2008</a>
+        <a id="2009" class="button yearButton">2009</a>
+        <a id="2010" class="button yearButton">2010</a>
+        <a id="2011" class="button yearButton">2011</a>
+        <a id="2012" class="button yearButton">2012</a>
+        <a id="2013" class="button yearButton">2013</a>
+        <a id="2014" class="button yearButton activeYear">2014</a>
+    </div>
     <script src="./js/d3.js"></script>
     <script src="./js/topojson.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css">
@@ -43,7 +49,6 @@
     var height_map = 780;
     var scale_map = 0.85;
 
-
     var x = d3.scale.linear()
         .range([0, width_graph]);
 
@@ -51,6 +56,8 @@
         .range([height_graph, 0]);
 
     var color = d3.scale.category10();
+    
+    var mapColorValues = d3.scale.linear();
 
     var xAxis = d3.svg.axis()
         .scale(x)
@@ -124,7 +131,13 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
     y.domain([
         d3.min(aktive_Gemeinden, function(c) { return d3.min(d3.values(c.properties.ind2))}),
         d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(c.properties.ind2))})
-    ]);    
+    ]);
+    
+    mapColorValues.domain([
+        d3.min(gemeindeDaten, function(c) { return d3.min(d3.values(c.properties.ind2))}),
+        d3.max(gemeindeDaten, function(c) { return d3.max(d3.values(c.properties.ind2))})
+    ]);
+    mapColorValues.nice().range([210,20]);
 
     //// Generate Map ////
     var gemeinden = mapPfade.selectAll('.gemeinden')
@@ -132,13 +145,20 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             .enter()
             .append('path')
             .attr("d", path)
-    //.attr('id', 'bfs'+d.bfs)
             .attr("class", function(d) {
-                    if (d.properties.ART_TEXT == 'See' ){
-                            return 'see';
-                    }  else {
-                            return 'gemeinden';
-                    }
+                if (d.properties.ART_TEXT == 'See' ){
+                        return 'see';
+                }  else {
+                        return 'gemeinden';
+                }
+            })
+            .style("fill", function(d) {
+                if(d.properties.ART_TEXT == "Gemeinde" && d.properties[indikator] != null) {
+                    console.log(Math.round(mapColorValues(d.properties[indikator][year])));
+                    return "rgb(0," + Math.round(mapColorValues(d.properties[indikator][year])) + ", 0)";
+                } else {
+                    return 0;
+                }
             });
 
 // First line
@@ -318,7 +338,23 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                 yearButton[0][i].classList.add("activeYear");
             }
         }
+        var toBe = "aktive_Gemeinden[gemeindenIndex].properties[indikator][year]";
+        console.log(indikator);
+        console.log(aktive_Gemeinden);
         
+        // change the color of all gemeinden
+        mapPfade.selectAll('.gemeinden').style("fill", function(d) {
+            if(d.properties.ART_TEXT == "Gemeinde" && d.properties[indikator] != null) {
+                    return "rgb(0," + Math.round(mapColorValues(d.properties[indikator][year])) + ", 0)";
+                } else {
+                    return 0;
+                }
+        });
+        
+        for(var gemeindenIndex = 0; gemeindenIndex < aktive_Gemeinden.length; gemeindenIndex++) {
+            console.log("Gemeinde Nr. " + gemeindenIndex);
+            console.log(eval(toBe));
+        } 
         
     }
     
