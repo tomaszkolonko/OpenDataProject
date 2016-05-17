@@ -133,12 +133,32 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         d3.max(aktive_Gemeinden, function(c) { return d3.max(d3.values(c.properties.ind2))})
     ]);
     
-    mapColorValues.domain([
-        d3.min(gemeindeDaten, function(c) { return d3.min(d3.values(c.properties.ind2))}),
-        d3.max(gemeindeDaten, function(c) { return d3.max(d3.values(c.properties.ind2))})
-    ]);
-    mapColorValues.nice().range([210,20]);
+    var mapMin = d3.min(gemeindeDaten, function(c) { if(c.properties[indikator] != null) { return c.properties[indikator][year]}});
+    var mapMax = d3.max(gemeindeDaten, function(c) { if(c.properties[indikator] != null) { return c.properties[indikator][year]}});
+    
+    mapColorValues.domain([mapMin,mapMax]);
+    
+    mapColorValues.range(['white', 'tomato'])
+        .interpolate(d3.interpolateLab);
 
+    //// Color Scala for Humans ////
+    for(var i = 0; i < 10; i++) {
+        d3.select("#map").append("rect")
+            .attr("class", "scale")
+            .attr("x", i*(witdth_map/10))
+            .attr("y", height_map-50)
+            .attr("height", 20)
+            .attr("width", witdth_map/10)
+            .style("fill", mapColorValues(+mapMin+i*(mapMax-mapMin)/10));
+        if(i%3==0) {
+            d3.select("#map").append("text")
+                .attr("x", i*(witdth_map/10)+3)
+                .attr("y", height_map-15)
+                .style("font-size", "16px")
+                .text(function(d) { return "~" + Math.round(i*((mapMax)/10)); });
+        }
+    }
+        
     //// Generate Map ////
     var gemeinden = mapPfade.selectAll('.gemeinden')
             .data(topojson.feature(topoJson, topoJson.objects.gemeinden2015).features)
@@ -154,7 +174,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
             })
             .style("fill", function(d) {
                 if(d.properties.ART_TEXT == "Gemeinde" && d.properties[indikator] != null) {
-                    return "rgb(0," + Math.round(mapColorValues(d.properties[indikator][year])) + ", 0)";
+                    return mapColorValues(d.properties[indikator][year]);
                 } else {
                     return 0;
                 }
@@ -194,6 +214,7 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         .data(aktive_Gemeinden)
         .enter()
         .append("g")
+        .attr("id", function(d) { return "bfs_" + d.properties.BFS; })
         .attr("class", "city");
     
     // casts an object into an array for easier element/element
@@ -263,57 +284,76 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         
         y.domain([lowest,highest]);
         
-            var chooseCorrectIndikator = "d.properties." + indikator;
-            var chooseCorrectSpendingForText = "d.properties." + indikator + "['2014']";
+        var chooseCorrectIndikator = "d.properties." + indikator;
+        var chooseCorrectSpendingForText = "d.properties." + indikator + "['2014']";
+
+        //// UPDATE Y AXIS ////
+        svg_graph.select(".y.axis").transition().duration(800).call(yAxis);
+
+        //// UPDATE SELECTION ////
+        console.log(aktive_Gemeinden[0].properties.BFS);
+        gemeinden_graph = svg_graph.selectAll(".city").data(aktive_Gemeinden, function(d) {
+            return d.properties.BFS;
+        });
+
+        //// UPDATE EXISTING PATHS ////
+        gemeinden_graph.selectAll("path")
+            .transition()
+            .duration(800)
+            .attr("d", function(d) { return (line(cast(eval(chooseCorrectIndikator)))); });
+
+        //// UPDATE EXISTING LABELS ////
+        gemeinden_graph.selectAll("text")
+            .transition()
+            .duration(800)
+            .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(eval(chooseCorrectSpendingForText)) + ")"; });
+        for(i = 0; i < aktive_Gemeinden.length; i++) {
+            console.log(aktive_Gemeinden[i].properties.NAME);
+        }
         
-            //// UPDATE Y AXIS ////
-            svg_graph.select(".y.axis").transition().duration(800).call(yAxis);
-            
-            //// UPDATE SELECTION ////
-            gemeinden_graph = svg_graph.selectAll(".city").data(aktive_Gemeinden);
         
-            //// UPDATE EXISTING PATHS ////
-            gemeinden_graph.selectAll("path")
-                .transition()
-                .duration(800)
-                .attr("d", function(d) { return (line(cast(eval(chooseCorrectIndikator)))); });
         
-            //// UPDATE EXISTING LABELS ////
-            gemeinden_graph.selectAll("text")
-                .transition()
-                .duration(800)
-                .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(eval(chooseCorrectSpendingForText)) + ")"; });
         
-            //// ENTER NEW PATHS ////
-            var newEntry = gemeinden_graph
-                .enter()
-                .append("g")
-                .attr("class", "city");
-            newEntry.append("path").attr("class", function(d) { return "line " + d.properties.NAME; })
-                .attr("d", function(d) { return (line(cast(eval(chooseCorrectIndikator)))); })
-                .style("stroke", function(d) { return color(d.properties.NAME); })
-                .style("opacity", 0)
-                .transition().delay(300).duration(800)
-                .style("opacity", 1);
-            newEntry.append("text")
-                .style("opacity", 0)
-                .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(eval(chooseCorrectSpendingForText)) + ")"; })
-                .attr("class", function(d) { return d.properties.NAME; })
-                .text(function(d) { return d.properties.NAME; })
-                .attr("x", 3)
-                .attr("dy", ".35em")
-                //.style("opacity", 0)
-                //.transition().duration(800) // CONFLICTS WITH UPPER TRANSITION
-                // second style attribute never run since transition stopped
-                .style("opacity", 1);
-                
-            //// EXIT NOT USED CITIES ////
-            gemeinden_graph
-                .exit()
-                .transition()
-                .duration(500)
-                .style("opacity", 0)
-                .remove();
+        var gezeichneteGem = [];
+        var all = d3.selectAll(".cites");
+        for(i=0; i<all[0].length; i++) {
+            gezeichneteGem.push(all[0].attr("id").split("_")[1]);
+        }
+        
+        
+        
+
+        //// ENTER NEW PATHS ////
+        var newEntry = gemeinden_graph
+            .enter()
+            .append("g")
+            .attr("class", "city")
+            .attr("id", function(d) { return "bfs_" + d.properties.BFS; });
+        newEntry.append("path").attr("class", function(d) { return "line " + d.properties.NAME; })
+            .attr("d", function(d) { return (line(cast(eval(chooseCorrectIndikator)))); })
+            .style("stroke", function(d) { return color(d.properties.NAME); })
+            .style("opacity", 0)
+            .transition().delay(300).duration(800)
+            .style("opacity", 1);
+        newEntry.append("text")
+            .style("opacity", 0)
+            .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(eval(chooseCorrectSpendingForText)) + ")"; })
+            .attr("class", function(d) { return d.properties.NAME; })
+            .text(function(d) { return d.properties.NAME; })
+            .attr("x", 3)
+            .attr("dy", ".35em")
+            //.style("opacity", 0)
+            //.transition().duration(800) // CONFLICTS WITH UPPER TRANSITION
+            // second style attribute never run since transition stopped
+            .style("opacity", 1);
+
+        //// EXIT NOT USED CITIES ////
+        gemeinden_graph
+            .exit()
+            .transition()
+            .duration(500)
+            .style("opacity", 0)
+            .remove();
     
     }
     
@@ -345,7 +385,6 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         }
         
     
-        console.log("->"); console.log(gemeindeDaten);
         mapColorValues.domain([map_lowest,map_highest]);
         
         var yearButton = d3.selectAll(".yearButton");
@@ -357,12 +396,12 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
                 yearButton[0][i].classList.add("activeYear");
             }
         }
-        var toBe = "aktive_Gemeinden[gemeindenIndex].properties[indikator][year]";
+        //var toBe = "aktive_Gemeinden[gemeindenIndex].properties[indikator][year]";
         
         // change the color of all gemeinden
-        mapPfade.selectAll('.gemeinden').style("fill", function(d) {
+        mapPfade.selectAll('.gemeinden').transition().duration(600).style("fill", function(d) {
             if(d.properties.ART_TEXT == "Gemeinde" && d.properties[indikator] != null) {
-                    return "rgb(0," + Math.round(mapColorValues(d.properties[indikator][year])) + ", 0)";
+                    return mapColorValues(d.properties[indikator][year]);
                 } else {
                     return 0;
                 }

@@ -82,3 +82,7 @@ svg {
     background-color: #008CBA;
     color: white;
 }
+
+.scale {
+    border: 1px solid #000;
+}
