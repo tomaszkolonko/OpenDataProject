@@ -403,10 +403,96 @@ d3.json("map/gemeinden2015_gefis.json", function(error, topoJson) {
         //gemeinden_graph.selectAll("text").enter().append("g")
             
     }
+    
+    ///// TOOLTIP ////
+    		var mouseOver = function(thisData, that, bbox) {
+			var mouseOverRW = 230,
+				mouseOverRH = 72;
+			//Position Tooltip
+			var xPos = bbox.x+bbox.width/2,
+				yPos = bbox.y+bbox.height/2;
+			//Korrektur, damit tooltip nicht über den Rand hinaus geht:
+			if (xPos>320) {
+				xPos = bbox.x+bbox.width/2-mouseOverRW
+			}
+			if (yPos>80) {
+				yPos = bbox.y+bbox.height/2-mouseOverRH
+			}
+			var mouseOverL = mapPfade.append('g').attr('id', 'mouseOverL')
+				.attr('pointer-events', 'none');
+
+			var mouseOverP = mouseOverL.append('g')
+				.attr('id','mouseOverP');
+			var mouseOverT = mouseOverL.append('g')
+				.attr('id','mouseOverT')
+				.attr('transform', 'translate('+(xPos)+','+(yPos)+')');
+
+			mouseOverP.append('path')
+				.attr("class", 'mouse')
+				.attr("d", that.attr('d'))
+				.style('fill', 'none')
+				.style('stroke', 'dimgrey')
+				.style('stroke-width', 2);
+			mouseOverT.append('rect')
+				.attr('x', -5)
+				.attr('y', 0)
+				.attr('width', mouseOverRW)
+				.attr('height', mouseOverRH)
+				.style('fill', 'GhostWhite')
+				.attr('fill-opacity', 0.8)
+				.style('stroke', 'dimgrey');
+			mouseOverT.append('path')
+				.attr("class", 'mouse')
+				.attr("d", that.attr('d'))
+				.style('fill', 'white')
+				.attr('transform', 'translate('+(-xPos)+','+(-yPos)+')');
+			
+			mouseOverT.append('text')
+				.attr('x', 5)
+				.attr('y', 20)
+				.style('font-size', '16px')
+				.style('font-weight', 'bold')
+				.text(thisData.properties.NAME);
+			var lineHeight = 22;
+            var m_spending = "";
+            if(thisData.properties[indikator] != null) {
+                m_spending = +thisData.properties[indikator][year]; 
+                m_text = "Nettoaufwendungen: ";
+            } else {
+                m_spending = "--";
+                m_text ="Keine Daten";
+            }
+
+			mouseOverT.append('text')
+				.attr('x', 5)
+				.attr('y', 20+lineHeight)
+				//.style('font-weight', 'bold')
+                .style("font-size", "16px")
+				.text(m_text);
+			mouseOverT.append('text')
+				.attr('x', mouseOverRW-15)
+				.attr('y', 20+lineHeight)
+				.style('font-size', '16px')
+				.attr('text-anchor', 'end')
+				.style('font-weight', 'bold')
+				.text(m_spending);
+
+
+		};	
+		var mouseOut = function() {
+			d3.select('#mouseOverL').remove();
+		};
              
     //// UPDATE ////
     d3.selectAll('.gemeinden')
         .attr('cursor', 'pointer')
+        .on('mouseover', function(d, i) {
+            var bbox = this.getBBox();
+            mouseOver(d, d3.select(this), bbox);
+        })
+        .on('mouseout', function(d, i) {
+            mouseOut();
+        })
         .on('click', function(d) {
             var mouseGem = d3.select(this);
             var tmpGemeinde = mouseGem[0][0].__data__;
