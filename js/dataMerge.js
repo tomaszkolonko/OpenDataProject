@@ -44,7 +44,8 @@ function compare(a,b) {
 
 
 d3.csv("js/data.csv", function(error, csv_data) {
-    d3.json("js/gemeinden2015Topo.json", function(error, json) {
+    d3.json("js/gemeinden2014Topo.json", function(error, json) {
+        console.log("current location");
         if (error) return console.warn(error);
         //console.log(csv_data);
         var jahr_max = d3.max(csv_data, function(d) {
@@ -86,7 +87,7 @@ d3.csv("js/data.csv", function(error, csv_data) {
             }
         }
 
-        var gemeinden = json.objects.gemeinden2015.geometries;
+        var gemeinden = json.objects.gemeinden2014.geometries;
         //Code zum mergen von csv_data und json
         //console.log(gemeinden);
         for (g=0;g<gemeinden.length;g++) {
@@ -101,7 +102,7 @@ d3.csv("js/data.csv", function(error, csv_data) {
 
         }
 
-    console.save(json, "gemeinden2015_gefis.json") //speichert das neue json
+    console.save(json, "gemeinden2014_gefis.json") //speichert das neue json
 
     })
 });

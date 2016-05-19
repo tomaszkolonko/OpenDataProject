@@ -5,6 +5,20 @@ body {
 svg {
     float: left;
 }
+
+p {
+    font-family: "Helvetica W01 Roman";
+    font-size: 18px;
+}
+
+.textField {
+    width: 1300px;
+}
+
+.textField p {
+    padding-bottom: 50px
+}
+
 .axis path,
 .axis line {
     fill: none;
