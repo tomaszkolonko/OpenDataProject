@@ -3,13 +3,16 @@
 
 <body>
     
-    <img src="Stempel_STAT-01.png" alt="some text" width=700>
+    <img src="Stempel_STAT-01.png" alt="some text" width=600>
     <div class="textField">
+        <h1>
+        Die Nettoaufwendungen des Kanton Zürich nach Aufgabenbereichen
+        </h1>
         <p>
-        Keffiyeh YOLO yuccie salvia sustainable ennui. Forage you probably haven't heard of them iPhone tumblr. Dreamcatcher trust fund locavore quinoa. Franzen taxidermy narwhal vegan cred, squid gentrify. Bushwick kombucha cronut crucifix roof party, fashion axe kitsch four loko chillwave cold-pressed twee ugh. Sartorial cred health goth, distillery truffaut gochujang 8-bit hella. Four dollar toast scenester tattooed, gentrify waistcoat humblebrag meh raw denim kale chips asymmetrical chartreuse blog distillery post-ironic.
+        Das Thema "Gemeindefinanzen" umfasst Daten zur Rechnung (Laufende Rechnung, Investitionsrechnung, Bestandesrechnung) und Finanzkennzahlen (Bruttoinvestitionen, Nettoinvestitionen, Bruttoverschuldungsanteil, Finanzvermögen, Eigenkapital, Fremdkapital, Investitionsanteil, Kapitaldienstanteil, Selbstfinanzierung, Selbstfinanzierungsanteil, Selbstfinanzierungsgrad, Zinsbelastungsanteil).
         </p>
         <p>
-        Gluten-free yuccie twee, stumptown photo booth semiotics helvetica. Before they sold out fixie synth etsy. Kickstarter slow-carb messenger bag neutra, thundercats sriracha normcore pabst keytar waistcoat biodiesel. Master cleanse tacos salvia craft beer, meditation umami chillwave. Bushwick before they sold out stumptown, photo booth forage gochujang brooklyn blog celiac skateboard seitan. Church-key everyday carry literally keytar, waistcoat actually neutra blog salvia. Ethical locavore mlkshk marfa.
+        In der folgenden Visualisierung können die Nettoaufwendungen pro Gemeinde, Jahr und Indikator dargestellt werden. Die Karte zeigt alle Gemeinden des Kanton Zürichs im Jahr 2014. Durch Klicken einer Gemeinde wird sie mit einer zusätzliche Linie im Graph dargestellt. Ein erneutes Klicken auf die selbe Gemeinde, lässt diese aus dem Graph verschwinden. Der Graph zeigt den Verlauf der Nettoaufwendung pro Indikator und Gemeinde über die Jahre 2008 bis 2014, während die Karte eine Jahresübersicht pro Indikator und Gemeinde darstellt.
         </p>
     </div>
     <div>
@@ -80,21 +83,18 @@
     .attr("class", "buttons");
     
     /* ************ map *************** */
-
     var svg_map = d3.select("body").append("svg")
         .attr("width", witdth_map)
         .attr("height", height_map)
 
     var map =  svg_map.append("g")
         .attr('id', 'map')
-        //.attr('transform','translate('+((1 - scale) * width/2)+','+((1 - scale) * mapH/2)+')scale('+scale+')');
         .attr('transform','translate('+0+','+0+')scale('+scale_map+')');
 
     var mapPfade =  map.append("g")
         .attr('id', 'mapPfade')
         .attr('transform', 'translate(30,0)');
 
-    // TODO: wont work out of the box anymore
     var line = d3.svg.line()
         .interpolate("basis")
         .x(function(d) { return x(d.date); })
@@ -413,7 +413,19 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
                 } else {
                     return 0;
                 }
-        });        
+        });
+        
+        //// Color Scala for Humans ////
+        d3.select("#map").selectAll("text").remove();
+        for(var i = 0; i < 10; i++) {
+        if(i%3==0) {
+            d3.select("#map").append("text")
+                .attr("x", i*(witdth_map/10)+3)
+                .attr("y", height_map-15)
+                .style("font-size", "16px")
+                .text(function(d) { return "~" + Math.round(i*((map_highest)/10)); });
+        }
+    }
     }
     
     ////////////////////////////////////
