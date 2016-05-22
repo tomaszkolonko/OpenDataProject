@@ -164,7 +164,11 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
                 .attr("x", i*(witdth_map/10)+23)
                 .attr("y", height_map-15)
                 .style("font-size", "16px")
-                .text(function(d) { return "~" + Math.round(i*((mapMax)/10)); });
+                .text(function(d) { 
+                if(i==9) {
+                    return mapMax;
+                }
+                return Math.round(+mapMin + (i)*((mapMax-mapMin)/10)); });
         }
     }
         
@@ -398,7 +402,6 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
                     return 0;
                 }
         });
-        
         //// Color Scala at the bottom of the map ////
         d3.select("#map").selectAll("text").remove();
         for(var i = 0; i < 10; i++) {
@@ -407,7 +410,12 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
                 .attr("x", i*(witdth_map/10)+23)
                 .attr("y", height_map-15)
                 .style("font-size", "16px")
-                .text(function(d) { return "~" + Math.round(i*((map_highest)/10)); });
+                .text(function(d) { 
+                    if(i == 9) {
+                        return Math.round(map_highest);
+                    } 
+                    return Math.round(+map_lowest + (i)*((map_highest-map_lowest)/10)); 
+                });
             }
         }
     }
