@@ -20,10 +20,12 @@ p {
 
 .textField {
     width: 1300px;
+    display: clear;
 }
 
 .textField p {
-    padding-bottom: 30px
+    padding-bottom: 30px;
+    display: clear;
 }
 
 .axis path,
@@ -33,7 +35,8 @@ p {
     shape-rendering: crispEdges;
 }
 
-.line { background-color: aqua;
+.line { 
+    background-color: aqua;
     font-size: 20px;
 }
 

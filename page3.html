@@ -35,19 +35,23 @@
         <a id="2013" class="button yearButton">2013</a>
         <a id="2014" class="button yearButton activeYear">2014</a>
     </div>
-    <script src="./js/d3.js"></script>
+    <script src="./js/d3.min.js"></script>
     <script src="./js/topojson.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    
+<!--    <div class="textFiled">
+        <p>Quellen: Amt für Statisik, Kanton Zürich</p>
+        <ul>
+            <li><p><a href="http://www.statistik.zh.ch/internet/justiz_inneres/statistik/de/daten/gemeindeportraet_kanton_zuerich.html">Amt für Statistik</a></p></li>
+        </ul>
+    </div>
+-->
+    
 <script>
 
 /* ********* PreWork ************* */
 
-    // use global variables for checking
-    // TODO delete afterwards
-    var global_data, cities_display;
-    
     // Default Value
-    // TODO should be an empty at beginning
     var indikator = "ind2";
     var year = "2014";
 
@@ -108,12 +112,9 @@
 
     var labels = d3.select("body").append("div")
         .attr("class", "labels");
-
-/* ********* Work with DATA ************* */
-
-
-d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
     
+/* ********* Work with DATA ************* */
+d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
     
     // Alle darzustellenden Gemeinden kommen hier rein
     var aktive_Gemeinden = [];
@@ -125,7 +126,7 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
     var gemeindeDaten = topoJson.objects.gemeinden2014.geometries;
     var ArrayofYears = d3.keys(gemeindeDaten[0].properties.ind0);
     
-    // TODO nur als Beispiel das erste Element genommen
+    // Default values
     aktive_Gemeinden.push(gemeindeDaten[0]);
     aktive_Gemeinden.push(gemeindeDaten[1]);
 
@@ -149,7 +150,7 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
     mapColorValues.range(['white', 'tomato'])
         .interpolate(d3.interpolateLab);
 
-    //// Color Scala for Humans ////
+    //// Color Scala at the bottom of the map ////
     for(var i = 0; i < 10; i++) {
         d3.select("#map").append("rect")
             .attr("class", "scale")
@@ -188,10 +189,6 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
                 }
             });
 
-// First line
-// d3.select('bfs'+261).attr('class'. 'selected');
-// drawLine('bfs261');
-    
     function checkIfActiveAndRemove(tmpGemeinde) {
         for(var i = 0; i < aktive_Gemeinden.length; i++) {
             if(aktive_Gemeinden[i].properties.BFS === tmpGemeinde.properties.BFS) {
@@ -227,7 +224,6 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
     
     // casts an object into an array for easier element/element
     // processing line method.
-    // TODO: check if refactoring ommits it
     function cast(o) {
         var castArray = [];
         for(var key in o) {
@@ -254,7 +250,6 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
     ////////////////////////////////
     //// UPDATE THE WHOLE GRAPH ////
     ////////////////////////////////
-    
     function updateGraph(indi) {
             //// INDICATOR ////
             if(indi !== "none") {
@@ -299,7 +294,7 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
         svg_graph.select(".y.axis").transition().duration(800).call(yAxis);
 
         //// UPDATE SELECTION ////
-        console.log(aktive_Gemeinden[0].properties.BFS);
+        // console.log(aktive_Gemeinden[0].properties.BFS);
         gemeinden_graph = svg_graph.selectAll(".city").data(aktive_Gemeinden, function(d) {
             return d.properties.BFS;
         });
@@ -315,21 +310,12 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
             .transition()
             .duration(800)
             .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(eval(chooseCorrectSpendingForText)) + ")"; });
-        for(i = 0; i < aktive_Gemeinden.length; i++) {
-            console.log(aktive_Gemeinden[i].properties.NAME);
-        }
-        
-        
-        
         
         var gezeichneteGem = [];
         var all = d3.selectAll(".cites");
         for(i=0; i<all[0].length; i++) {
             gezeichneteGem.push(all[0].attr("id").split("_")[1]);
         }
-        
-        
-        
 
         //// ENTER NEW PATHS ////
         var newEntry = gemeinden_graph
@@ -380,14 +366,13 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
         for(var index = 0; index < gemeindeDaten.length; index++) {
             if(gemeindeDaten[index].properties[indikator] != null) {
                 var amount = +gemeindeDaten[index].properties[indikator][year];
-                console.log("amount: " + amount);
                 if(amount > map_highest) {
                     map_highest = amount;
-                    console.log("map_highest: " + map_highest);
+                    // console.log("map_highest: " + map_highest);
                 }
                 if(amount < map_lowest) {
                     map_lowest = amount;
-                    console.log("map_lowest: " + map_lowest);
+                    // console.log("map_lowest: " + map_lowest);
                 }
             }
         }
@@ -404,7 +389,6 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
                 yearButton[0][i].classList.add("activeYear");
             }
         }
-        //var toBe = "aktive_Gemeinden[gemeindenIndex].properties[indikator][year]";
         
         // change the color of all gemeinden
         mapPfade.selectAll('.gemeinden').transition().duration(600).style("fill", function(d) {
@@ -424,14 +408,13 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
                 .attr("y", height_map-15)
                 .style("font-size", "16px")
                 .text(function(d) { return "~" + Math.round(i*((map_highest)/10)); });
+            }
         }
-    }
     }
     
     ////////////////////////////////////
     //// SET GRAPH TO NEW INDICATOR ////
     ////////////////////////////////////
-    
     d3.select("body").selectAll(".indikatorButton").on("click", function(d) {
         updateGraph(d3.select(this)[0][0].id);
         updateMap(0);
@@ -440,101 +423,91 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
     ///////////////////////////////////
     //// SET MAPCOLORS TO NEW YEAR ////
     ///////////////////////////////////
-    
     d3.select("body").selectAll(".yearButton").on("click", function(d) {
         updateMap(+d3.select(this)[0][0].id);
     })
     
-    
-    // AT THE MOMENT NOT USED: maybe to solve the transition problem....
     function updateTextLabels() {
-            //// UPDATE SELECTION ////
-        
-        // AT THE MOMENT NOT USED: maybe to solve the transition problem....
+        //// UPDATE SELECTION ////
         gemeinden_graph = svg_graph.selectAll(".city").data(aktive_Gemeinden);
         
         gemeinden_graph.selectAll("text")
-                //.datum(function(d) { return {name: d.properties.NAME.split(' ')[0], date: 2014, spending: d.properties.ind2["2014"] }; })
                 .transition()
                 .duration(800)
-                .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(d.properties.ind2["2014"]) + ")"; });
-        
-        //gemeinden_graph.selectAll("text").enter().append("g")
-            
+                .attr("transform", function(d) { return "translate(" + x(2014) + "," + y(d.properties.ind2["2014"]) + ")"; });            
     }
     
-    ///// TOOLTIP ////
-    		var mouseOver = function(thisData, that, bbox) {
-			var mouseOverRW = 230,
-				mouseOverRH = 72;
-			//Position Tooltip
-			var xPos = bbox.x+bbox.width/2,
-				yPos = bbox.y+bbox.height/2;
-			//Korrektur, damit tooltip nicht über den Rand hinaus geht:
-			if (xPos>320) {
-				xPos = bbox.x+bbox.width/2-mouseOverRW
-			}
-			if (yPos>80) {
-				yPos = bbox.y+bbox.height/2-mouseOverRH
-			}
-			var mouseOverL = mapPfade.append('g').attr('id', 'mouseOverL')
-				.attr('pointer-events', 'none');
+    //// TOOLTIP ////
+    var mouseOver = function(thisData, that, bbox) {
+    var mouseOverRW = 230,
+        mouseOverRH = 72;
+    //Position Tooltip
+    var xPos = bbox.x+bbox.width/2,
+        yPos = bbox.y+bbox.height/2;
+    //Korrektur, damit tooltip nicht über den Rand hinaus geht:
+    if (xPos>320) {
+        xPos = bbox.x+bbox.width/2-mouseOverRW
+    }
+    if (yPos>80) {
+        yPos = bbox.y+bbox.height/2-mouseOverRH
+    }
+    var mouseOverL = mapPfade.append('g').attr('id', 'mouseOverL')
+        .attr('pointer-events', 'none');
 
-			var mouseOverP = mouseOverL.append('g')
-				.attr('id','mouseOverP');
-			var mouseOverT = mouseOverL.append('g')
-				.attr('id','mouseOverT')
-				.attr('transform', 'translate('+(xPos)+','+(yPos)+')');
+    var mouseOverP = mouseOverL.append('g')
+        .attr('id','mouseOverP');
+    var mouseOverT = mouseOverL.append('g')
+        .attr('id','mouseOverT')
+        .attr('transform', 'translate('+(xPos)+','+(yPos)+')');
 
-			mouseOverP.append('path')
-				.attr("class", 'mouse')
-				.attr("d", that.attr('d'))
-				.style('fill', 'none')
-				.style('stroke', 'dimgrey')
-				.style('stroke-width', 2);
-			mouseOverT.append('rect')
-				.attr('x', -5)
-				.attr('y', 0)
-				.attr('width', mouseOverRW)
-				.attr('height', mouseOverRH)
-				.style('fill', 'GhostWhite')
-				.attr('fill-opacity', 0.8)
-				.style('stroke', 'dimgrey');
-			mouseOverT.append('path')
-				.attr("class", 'mouse')
-				.attr("d", that.attr('d'))
-				.style('fill', 'white')
-				.attr('transform', 'translate('+(-xPos)+','+(-yPos)+')');
-			
-			mouseOverT.append('text')
-				.attr('x', 5)
-				.attr('y', 20)
-				.style('font-size', '16px')
-				.style('font-weight', 'bold')
-				.text(thisData.properties.NAME);
-			var lineHeight = 22;
-            var m_spending = "";
-            if(thisData.properties[indikator] != null) {
-                m_spending = +thisData.properties[indikator][year]; 
-                m_text = "Nettoaufwendungen: ";
-            } else {
-                m_spending = "--";
-                m_text ="Keine Daten";
-            }
+    mouseOverP.append('path')
+        .attr("class", 'mouse')
+        .attr("d", that.attr('d'))
+        .style('fill', 'none')
+        .style('stroke', 'dimgrey')
+        .style('stroke-width', 2);
+    mouseOverT.append('rect')
+        .attr('x', -5)
+        .attr('y', 0)
+        .attr('width', mouseOverRW)
+        .attr('height', mouseOverRH)
+        .style('fill', 'GhostWhite')
+        .attr('fill-opacity', 0.8)
+        .style('stroke', 'dimgrey');
+    mouseOverT.append('path')
+        .attr("class", 'mouse')
+        .attr("d", that.attr('d'))
+        .style('fill', 'white')
+        .attr('transform', 'translate('+(-xPos)+','+(-yPos)+')');
 
-			mouseOverT.append('text')
-				.attr('x', 5)
-				.attr('y', 20+lineHeight)
-				//.style('font-weight', 'bold')
-                .style("font-size", "16px")
-				.text(m_text);
-			mouseOverT.append('text')
-				.attr('x', mouseOverRW-15)
-				.attr('y', 20+lineHeight)
-				.style('font-size', '16px')
-				.attr('text-anchor', 'end')
-				.style('font-weight', 'bold')
-				.text(m_spending);
+    mouseOverT.append('text')
+        .attr('x', 5)
+        .attr('y', 20)
+        .style('font-size', '16px')
+        .style('font-weight', 'bold')
+        .text(thisData.properties.NAME);
+    var lineHeight = 22;
+    var m_spending = "";
+    if(thisData.properties[indikator] != null) {
+        m_spending = +thisData.properties[indikator][year]; 
+        m_text = "Nettoaufwendungen: ";
+    } else {
+        m_spending = "--";
+        m_text ="Keine Daten";
+    }
+
+    mouseOverT.append('text')
+        .attr('x', 5)
+        .attr('y', 20+lineHeight)
+        .style("font-size", "16px")
+        .text(m_text);
+    mouseOverT.append('text')
+        .attr('x', mouseOverRW-15)
+        .attr('y', 20+lineHeight)
+        .style('font-size', '16px')
+        .attr('text-anchor', 'end')
+        .style('font-weight', 'bold')
+        .text(m_spending);
 
 
 		};	
@@ -558,21 +531,11 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
             if(!checkIfActiveAndRemove(tmpGemeinde)) {
                 aktive_Gemeinden.push(tmpGemeinde);
             }
-        console.log(mouseGem);
-            
+        
             updateGraph("none");
-            //updateTextLabels();
-
-                    
-                    // wichtig: nicht nur mit this arbeiten, sondern mit d3.select(this)
-                    // d3 selection liefert anderes Objekt zurück als reines javascript this
-                    // d3.selection beinhaltet databindings!
-                    // vergleiche mal console.log(d3.select(this)) mit console.log(this);
             })
 
 });
-
-
 
 </script>
 </body>
