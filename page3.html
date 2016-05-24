@@ -161,7 +161,7 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
             .style("fill", mapColorValues(+mapMin+i*(mapMax-mapMin)/10));
         if(i%3==0) {
             d3.select("#map").append("text")
-                .attr("x", i*(witdth_map/10)+23)
+                .attr("x", i*(witdth_map/10)+33)
                 .attr("y", height_map-15)
                 .style("font-size", "16px")
                 .text(function(d) { 
@@ -407,7 +407,7 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
         for(var i = 0; i < 10; i++) {
         if(i%3==0) {
             d3.select("#map").append("text")
-                .attr("x", i*(witdth_map/10)+23)
+                .attr("x", i*(witdth_map/10)+33)
                 .attr("y", height_map-15)
                 .style("font-size", "16px")
                 .text(function(d) { 
