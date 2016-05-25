@@ -39,14 +39,6 @@
     <script src="./js/topojson.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css">
     
-<!--    <div class="textFiled">
-        <p>Quellen: Amt für Statisik, Kanton Zürich</p>
-        <ul>
-            <li><p><a href="http://www.statistik.zh.ch/internet/justiz_inneres/statistik/de/daten/gemeindeportraet_kanton_zuerich.html">Amt für Statistik</a></p></li>
-        </ul>
-    </div>
--->
-    
 <script>
 
 /* ********* PreWork ************* */
@@ -155,14 +147,14 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
         d3.select("#map").append("rect")
             .attr("class", "scale")
             .attr("x", i*(witdth_map/10)+20)
-            .attr("y", height_map-50)
+            .attr("y", height_map-80)
             .attr("height", 20)
             .attr("width", witdth_map/10)
             .style("fill", mapColorValues(+mapMin+i*(mapMax-mapMin)/10));
         if(i%3==0) {
             d3.select("#map").append("text")
                 .attr("x", i*(witdth_map/10)+33)
-                .attr("y", height_map-15)
+                .attr("y", height_map-45)
                 .style("font-size", "16px")
                 .text(function(d) { 
                 if(i==9) {
@@ -372,11 +364,9 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
                 var amount = +gemeindeDaten[index].properties[indikator][year];
                 if(amount > map_highest) {
                     map_highest = amount;
-                    // console.log("map_highest: " + map_highest);
                 }
                 if(amount < map_lowest) {
                     map_lowest = amount;
-                    // console.log("map_lowest: " + map_lowest);
                 }
             }
         }
@@ -408,7 +398,7 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
         if(i%3==0) {
             d3.select("#map").append("text")
                 .attr("x", i*(witdth_map/10)+33)
-                .attr("y", height_map-15)
+                .attr("y", height_map-45)
                 .style("font-size", "16px")
                 .text(function(d) { 
                     if(i == 9) {
