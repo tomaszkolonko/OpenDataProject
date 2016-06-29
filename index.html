@@ -2,19 +2,6 @@
 <meta charset="utf-8">
 
 <body>
-    
-    <img src="Stempel_STAT-01.png" alt="some text" width=600>
-    <div class="textField">
-        <h1>
-        Die Nettoaufwendungen des Kanton Zürich nach Aufgabenbereichen
-        </h1>
-        <p>
-        Das Thema "Gemeindefinanzen" umfasst Daten zur Rechnung (Laufende Rechnung, Investitionsrechnung, Bestandesrechnung) und Finanzkennzahlen (Bruttoinvestitionen, Nettoinvestitionen, Bruttoverschuldungsanteil, Finanzvermögen, Eigenkapital, Fremdkapital, Investitionsanteil, Kapitaldienstanteil, Selbstfinanzierung, Selbstfinanzierungsanteil, Selbstfinanzierungsgrad, Zinsbelastungsanteil).
-        </p>
-        <p>
-        In der folgenden Visualisierung können die Nettoaufwendungen pro Gemeinde, Jahr und Indikator dargestellt werden. Die Karte zeigt alle Gemeinden des Kanton Zürichs im Jahr 2014. Durch Klicken einer Gemeinde wird sie mit einer zusätzliche Linie im Graph dargestellt. Ein erneutes Klicken auf die selbe Gemeinde, lässt diese aus dem Graph verschwinden. Der Graph zeigt den Verlauf der Nettoaufwendung pro Indikator und Gemeinde über die Jahre 2008 bis 2014, während die Karte eine Jahresübersicht pro Indikator und Gemeinde darstellt.
-        </p>
-    </div>
     <div>
         <a id="ind0" class="button indikatorButton">Behörden u. allg. Verwaltung</a>
         <a id="ind1" class="button indikatorButton">Rechtsschutz und Sicherheit</a>
@@ -52,8 +39,8 @@
     var width_graph = 920 - margin.left - margin.right;
     var height_graph = 500 - margin.top - margin.bottom;
 
-    var witdth_map = 542;
-    var height_map = 760;
+    var width_map = 530;
+    var height_map = 680;
     var scale_map = 0.85;
 
     var x = d3.scale.linear()
@@ -80,12 +67,14 @@
     
     /* ************ map *************** */
     var svg_map = d3.select("body").append("svg")
-        .attr("width", witdth_map)
+        .attr("width", width_map)
         .attr("height", height_map)
 
     var map =  svg_map.append("g")
         .attr('id', 'map')
-        .attr('transform','translate('+0+','+0+')scale('+scale_map+')');
+        .attr('width', width_map)
+        .attr('height', height_map)
+        .attr('transform','translate(0,0)scale('+scale_map+')');
 
     var mapPfade =  map.append("g")
         .attr('id', 'mapPfade')
@@ -146,15 +135,15 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
     for(var i = 0; i < 10; i++) {
         d3.select("#map").append("rect")
             .attr("class", "scale")
-            .attr("x", i*(witdth_map/10)+20)
-            .attr("y", height_map-80)
+            .attr("x", i*(width_map/10)+20)
+            .attr("y", height_map-20)
             .attr("height", 20)
-            .attr("width", witdth_map/10)
+            .attr("width", width_map/10)
             .style("fill", mapColorValues(+mapMin+i*(mapMax-mapMin)/10));
         if(i%3==0) {
             d3.select("#map").append("text")
-                .attr("x", i*(witdth_map/10)+33)
-                .attr("y", height_map-45)
+                .attr("x", i*(width_map/10)+33)
+                .attr("y", height_map-5)
                 .style("font-size", "16px")
                 .text(function(d) { 
                 if(i==9) {
@@ -397,7 +386,7 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
         for(var i = 0; i < 10; i++) {
         if(i%3==0) {
             d3.select("#map").append("text")
-                .attr("x", i*(witdth_map/10)+33)
+                .attr("x", i*(width_map/10)+33)
                 .attr("y", height_map-45)
                 .style("font-size", "16px")
                 .text(function(d) { 
