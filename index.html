@@ -2,16 +2,6 @@
 <meta charset="utf-8">
 
 <body>
-    <div>
-        <a id="ind0" class="button indikatorButton">Behörden u. allg. Verwaltung</a>
-        <a id="ind1" class="button indikatorButton">Rechtsschutz und Sicherheit</a>
-        <a id="ind2" class="button indikatorButton activeIndikator">Bildung</a>
-        <a id="ind3" class="button indikatorButton">Kultur und Freizeit</a>
-        <a id="ind4" class="button indikatorButton">Gesundheit</a>
-        <a id="ind5" class="button indikatorButton">soz. Wohlfahrt</a>
-        <a id="ind6" class="button indikatorButton">Verkehr</a>
-        <a id="ind7" class="button indikatorButton">Umwelt u. Raumordnung</a>
-    </div>
     <span style="padding-left:100px"></span>
     <div>
         <a id="2008" class="button yearButton">2008</a>
@@ -34,14 +24,14 @@
     var indikator = "ind2";
     var year = "2014";
 
-    var margin = {top: 40, right: 120, bottom: 30, left: 80};
+    var margin = {top: 40, right: 120, bottom: 30, left: 60};
 
-    var width_graph = 920 - margin.left - margin.right;
-    var height_graph = 500 - margin.top - margin.bottom;
+    var width_graph = 570 - margin.left - margin.right;
+    var height_graph = 350 - margin.top - margin.bottom;
 
-    var width_map = 530;
-    var height_map = 680;
-    var scale_map = 0.85;
+    var width_map = 350;
+    var height_map = 500;
+    var scale_map = 0.68;
 
     var x = d3.scale.linear()
         .range([0, width_graph]);
@@ -62,24 +52,77 @@
         .scale(y)
         .orient("left");
     
-    var buttons = d3.select("body").append("div")
-    .attr("class", "buttons");
-    
     /* ************ map *************** */
     var svg_map = d3.select("body").append("svg")
-        .attr("width", width_map)
-        .attr("height", height_map)
+        .attr('width', width_map)
+        .attr('height', height_map)
 
     var map =  svg_map.append("g")
         .attr('id', 'map')
-        .attr('width', width_map)
-        .attr('height', height_map)
-        .attr('transform','translate(0,0)scale('+scale_map+')');
-
+        .attr('width', width_map-10)
+        .attr('height', height_map-10)
+        .attr('transform','translate(-20,0)scale('+scale_map+')');
+    
     var mapPfade =  map.append("g")
         .attr('id', 'mapPfade')
+        .attr('transform', 'translate(30,20)');
+    
+    /* ************** button container *************** */
+    var button_text = ["Behörden u. allg. Verwaltung", "Rechtsschutz und Sicherheit", "Bildung",
+                       "Kultur und Freizeit", "Gesundheit", "soz. Wohlfahrt", "Umwelt u. Raumordnung"];
+   
+    
+    var container = d3.select("body")
+        .append("div")
+        .attr('id', 'container');
+    
+    var buttons_data = container.selectAll("a")
+        .data(button_text)
+        .enter()
+        .append("a")
+        .attr('id', function(d, i) {
+            return "ind" + i;
+        })
+        .attr("class", function(d, i) {
+            if(i == 2) {
+                return "button indikatorButton activeIndikator";
+            }
+            return "button indikatorButton";
+        })
+        .text(function(d) {
+            return d;
+        })
+        .append("div");
+    
+    /*
+    var svg_button_container = d3.select("body").append("svg")
+        .attr('width', 240)
+        .attr('height', height_graph);
+    
+    var svg_buttons_g = svg_button_container.append("g")
+        .attr('width', 230)
+        .attr('height', height_graph-10)
+        .attr('transform', 'translate(100,100)');
+    
+    svg_buttons_g.selectAll("a")
+        .data(button_text)
+        .enter()
+        .append("a")
+        .attr('id', function(d, i) {
+        return "ind" + i;
+        })
+        .attr("class", function(d, i) {
+            if(i == 2) {
+                return "button indikatorButton activeIndikator";
+            }
+            return "button indikatorButton";
+        })
+        .text(function(d) {
+            return d;
+        })
         .attr('transform', 'translate(30,0)');
 
+    /* ************** graph ************** */
     var line = d3.svg.line()
         .interpolate("basis")
         .x(function(d) { return x(d.date); })
@@ -135,16 +178,16 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
     for(var i = 0; i < 10; i++) {
         d3.select("#map").append("rect")
             .attr("class", "scale")
-            .attr("x", i*(width_map/10)+20)
-            .attr("y", height_map-20)
+            .attr("x", i*(width_map/(10*scale_map*1.05))+40)
+            .attr("y", height_map+180)
             .attr("height", 20)
-            .attr("width", width_map/10)
+            .attr("width", width_map/(10*scale_map*1.05))
             .style("fill", mapColorValues(+mapMin+i*(mapMax-mapMin)/10));
         if(i%3==0) {
             d3.select("#map").append("text")
-                .attr("x", i*(width_map/10)+33)
-                .attr("y", height_map-5)
-                .style("font-size", "16px")
+                .attr("x", i*(width_map/(10*scale_map*1.05))+45)
+                .attr("y", height_map+195)
+                .style("font-size", "14px")
                 .text(function(d) { 
                 if(i==9) {
                     return mapMax;
@@ -386,9 +429,9 @@ d3.json("map/gemeinden2014_gefis.json", function(error, topoJson) {
         for(var i = 0; i < 10; i++) {
         if(i%3==0) {
             d3.select("#map").append("text")
-                .attr("x", i*(width_map/10)+33)
-                .attr("y", height_map-45)
-                .style("font-size", "16px")
+                .attr("x", i*(width_map/(10*scale_map*1.05))+45)
+                .attr("y", height_map+195)
+                .style("font-size", "14px")
                 .text(function(d) { 
                     if(i == 9) {
                         return Math.round(map_highest);

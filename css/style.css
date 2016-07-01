@@ -79,7 +79,14 @@ p {
 .indikatorButton {
     background-color: white; 
     color: black; 
+    margin-top: 20px;
     border: 2px solid #4CAF50;
+    float: right;
+    
+}
+
+#container {
+    margin-top: 40px;
 }
 
 .indikatorButton:hover {
